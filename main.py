@@ -1,16 +1,17 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
 from functions import *
 from datetime import datetime
 
 app = Flask(__name__)
 
-MIN_REPEATED_SIGNS = 25
-MAX_WORD_LENGTH = 255
-LOGIN = ''
-PASSWORD = ''
-ADDRESS = ''
+MIN_REPEATED_SIGNS: int = 25
+MAX_USER_LENGTH: int = 31
+MAX_WORD_LENGTH: int = 255
+LOGIN: str = ''
+PASSWORD: str = ''
+ADDRESS: str = ''
+
 with open('./login.txt', 'r') as file:
     LOGIN = file.read().strip()
 with open('./password.txt', 'r') as file:
@@ -20,7 +21,7 @@ with open('./address.txt', 'r') as file:
 
 MONGO_URI = f'mongodb://{LOGIN}:{PASSWORD}@{ADDRESS}/hashes?authSource=admin'
 
-
+# Connect to mongodb
 try:
     client = MongoClient(MONGO_URI)
     db = client.get_database()
@@ -36,26 +37,32 @@ def default():
 @app.route('/write', methods=['POST'])
 def write():
     data = request.get_json()
-    word = data.get('word', '')
+    word: str = data.get('word', '')
+    hashType: str = data.get('hashType', '')
+    user: str = data.get('user', '')
+
+    # Validation (1/2) Process before finding a hash
     if not word:
         return jsonify({"msg": "You need to provide a 'word'."}), 400
     if len(word) > MAX_WORD_LENGTH:
         return jsonify({"msg": f"You reach the max length of the word. Max length is {MAX_WORD_LENGTH} (Your: {len(word)})."}), 400
-    hashType = data.get('hashType', '')
+    if len(user) > MAX_USER_LENGTH:
+        return jsonify({"msg": f"You reach the max length of the user. Max length is {MAX_USER_LENGTH} (Your: {len(user)})."}), 400
     if not hashType or hashType != 'sha256':
         return jsonify({"msg": "You need to provide a 'hashType' (Current support: sha256)."}), 400
-    user = data.get('user', '')
-
     if collection.find_one({"word": word}):
         return jsonify({"msg": "This hash is already in database."}), 400
 
+    # Find hash
     hash_in_hex = get_sha256_hash(word)
     hash_in_binary = convert_hex_to_binary(hash_in_hex)
-    print(hash_in_binary)
     repeated_counts = count_repeated_pattern_from_start(hash_in_binary)
+
+    # Validation (2/2) Checking if hash actual a rare one
     if repeated_counts < MIN_REPEATED_SIGNS:
         return jsonify({"msg": f"Your hash has lower that {MIN_REPEATED_SIGNS} repeated signs ({repeated_counts}). "}), 400
     
+    # Writing to a database
     write_data = {  "word": word,
                     "isFromBeggining": True,
                     "counts": repeated_counts,
@@ -63,7 +70,6 @@ def write():
                     "user": user,
                     "created_at": datetime.utcnow()
                     }
-    
     try:
         collection.insert_one(write_data)
         return jsonify({"msg": "Hash is successfully added."}), 201
