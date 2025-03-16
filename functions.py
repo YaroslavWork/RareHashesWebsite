@@ -13,4 +13,5 @@ def get_sha256_hash(word: str) -> str:
 
 def convert_hex_to_binary(hex: str) -> str:
     hash_in_binary = format(int(hex, 16), '0>42b')
-    return f"{"0" * (256-len(hash_in_binary))}{hash_in_binary}"
+    padding = "0" * (256-len(hash_in_binary))
+    return f"{padding}{hash_in_binary}"

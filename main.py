@@ -2,10 +2,12 @@ from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 from functions import *
+from datetime import datetime
 
 app = Flask(__name__)
 
 MIN_REPEATED_SIGNS = 25
+MAX_WORD_LENGTH = 255
 LOGIN = ''
 PASSWORD = ''
 ADDRESS = ''
@@ -37,6 +39,8 @@ def write():
     word = data.get('word', '')
     if not word:
         return jsonify({"msg": "You need to provide a 'word'."}), 400
+    if len(word) > MAX_WORD_LENGTH:
+        return jsonify({"msg": f"You reach the max length of the word. Max length is {MAX_WORD_LENGTH} (Your: {len(word)})."}), 400
     hashType = data.get('hashType', '')
     if not hashType or hashType != 'sha256':
         return jsonify({"msg": "You need to provide a 'hashType' (Current support: sha256)."}), 400
@@ -56,7 +60,8 @@ def write():
                     "isFromBeggining": True,
                     "counts": repeated_counts,
                     "hashType": hashType,
-                    "user": user
+                    "user": user,
+                    "created_at": datetime.utcnow()
                     }
     
     try:
