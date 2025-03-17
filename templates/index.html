@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rarest Hashes - Welcome Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="header">
+        <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
+        <div id="menu">
+            <a href="{{ url_for('view')}}">
+                <button class="mainButton" id="viewButton">View</button>
+            </a>
+            <button class="mainButton">Write</button>
+        </div>
+    </div>
+    <div class="content" id="mainContent">
+        <h3>About:</h3>
+        <p>Project <span id="logoText">"Rarest Hashes"</span> was created to find rare repeated values ​​in hashes.</p>
+        <p>The rarity is to find a repeating pattern (0 or 1) at the beginning or end of the hash. The minimum hash that is accepted for saving in the database must have no less than 25 repeating characters.</p>
+        <p>You can save this hash using a word that turns into this hash. On the server side, it is checked whether the hash is really rare and if successful, it is saved to the database along with the (optional) nickname</p>
+        <h3>Methods to write your hash:</h3>
+        <p>The first method is to click on the button below. You will be taken to a form that you need to fill out to enter the rare hash into the database.</p>
+        <button class="mainButton">Write</button>
+        <p>The second method is to download a bot from my github to automatically find and send hashes</p>
+        <button class="mainButton">Go to github</button>
+        <h3>Headers:</h3>
+        <p>This project was created by YAr (github: YaroslavWork) for educational purposes.</p>
+        <button class="mainButton">Github</button>
+        <p>Good luck finding the rarest hash.</p>
+    </div>
+</body>
+</html>

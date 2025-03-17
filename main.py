@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 from pymongo import MongoClient
 from functions import *
 from datetime import datetime
@@ -32,7 +32,25 @@ except ConnectionError as e:
 
 @app.route('/')
 def default():
-    return "Hello I'm working"
+    return render_template('index.html')
+
+@app.route('/view')
+def view():
+    return redirect(url_for('view_with_params', page=1, created_at=1))
+
+@app.route('/view/<int:page>')
+def view_with_params(page: int):
+    sort_data = []
+    sort_args = ['word, isFromBeggining', 'counts', 'hashType', 'user', 'created_at']
+    for arg in sort_args:
+        temp = request.args.get(arg, '0')
+        if temp == '1':
+            sort_data.append((arg, 1))
+        elif temp == '-1':
+            sort_data.append((arg, -1))
+    result = list(collection.find().sort(sort_data).skip(100*(page-1)).limit(100))
+
+    return render_template('view.html', result=result)
 
 @app.route('/write', methods=['POST'])
 def write():
@@ -83,4 +101,4 @@ if __name__ == '__main__':
         adress = file.read().strip()
         HOST = adress.split(':')[0]
         PORT = adress.split(':')[1]
-    app.run(host=HOST, port=PORT, debug=False)
+    app.run(host=HOST, port=PORT, debug=True)

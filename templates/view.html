@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rarest Hashes - Welcome Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="header">
+        <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
+        <div id="menu">
+            <a href="{{ url_for('default')}}">
+                <button class="mainButton" id="welcomeButton">Welcome Page</button>
+            </a>
+            <button class="mainButton">Write</button>
+        </div>
+    </div>
+    <div class="content" id="viewContent">
+        <h3>List:</h3>
+        <table id="viewTable">
+            <tr>
+                <th><div class="thContainer">
+                    Word
+                    <div class="thButtonsContainer">
+                        <button>&uarr;</button>
+                        <button>&darr;</button>
+                    </div>
+                </div></th>
+                <th><div class="thContainer">
+                    Start From Beggining
+                    <div class="thButtonsContainer">
+                        <button>&uarr;</button>
+                        <button>&darr;</button>
+                    </div>
+                </div></th>
+                <th>Hash Type</th>
+                <th><div class="thContainer">
+                    Counts
+                    <div class="thButtonsContainer">
+                        <button>&uarr;</button>
+                        <button>&darr;</button>
+                    </div>
+                </div></th>
+                <th>User</th>
+                <th><div class="thContainer">
+                    Created At
+                    <div class="thButtonsContainer">
+                        <button>&uarr;</button>
+                        <button>&darr;</button>
+                    </div>
+                </div></th>
+                <th>Hash (in hex)</th>
+                <!-- <th>Hash (in dec)</th> -->
+            </tr>
+            {% for item in result %}
+            <tr>
+                <td>{{ item.word }}</td>
+                <td>{{ item.isFromBeggining }}</td>
+                <td>{{ item.hashType }}</td>
+                <td>{{ item.counts }}</td>
+                <td>{{ item.user }}</td>
+                <td>{{ item.created_at }}</td>
+                <td>[Empty]</td>
+                <!-- <td>[Empty]</td> -->
+                
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <script src="{{ url_for('static', filename='hashes.js') }}"></script>
+</body>
+</html>
