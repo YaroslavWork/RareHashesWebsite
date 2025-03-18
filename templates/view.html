@@ -20,37 +20,38 @@
         </div>
     </div>
     <div class="content" id="viewContent">
-        <h3>List:</h3>
+        <h3>List (Results {{ count }}): </h3>
         <table id="viewTable">
             <tr>
+                <th>#</th>
                 <th><div class="thContainer">
                     Word
                     <div class="thButtonsContainer">
-                        <button>&uarr;</button>
-                        <button>&darr;</button>
+                        <button class="smallFilterButton">&uarr;</button>
+                        <button class="smallFilterButton">&darr;</button>
                     </div>
                 </div></th>
                 <th><div class="thContainer">
                     Start From Beggining
                     <div class="thButtonsContainer">
-                        <button>&uarr;</button>
-                        <button>&darr;</button>
+                        <button class="smallFilterButton">&uarr;</button>
+                        <button class="smallFilterButton">&darr;</button>
                     </div>
                 </div></th>
                 <th>Hash Type</th>
                 <th><div class="thContainer">
                     Counts
                     <div class="thButtonsContainer">
-                        <button>&uarr;</button>
-                        <button>&darr;</button>
+                        <button class="smallFilterButton">&uarr;</button>
+                        <button class="smallFilterButton">&darr;</button>
                     </div>
                 </div></th>
                 <th>User</th>
                 <th><div class="thContainer">
                     Created At
                     <div class="thButtonsContainer">
-                        <button>&uarr;</button>
-                        <button>&darr;</button>
+                        <button class="smallFilterButton">&uarr;</button>
+                        <button class="smallFilterButton">&darr;</button>
                     </div>
                 </div></th>
                 <th>Hash (in hex)</th>
@@ -58,6 +59,7 @@
             </tr>
             {% for item in result %}
             <tr>
+                <td>[Number]</td>
                 <td>{{ item.word }}</td>
                 <td>{{ item.isFromBeggining }}</td>
                 <td>{{ item.hashType }}</td>

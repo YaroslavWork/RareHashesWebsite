@@ -43,6 +43,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    text-align: center;
 }
 
 .thButtonsContainer {
@@ -123,6 +124,20 @@ table {
   touch-action: manipulation;
   vertical-align: top;
   white-space: nowrap;
+}
+
+.smallFilterButton {
+    background-color: #728eb9;
+    cursor: pointer;
+    color: #fff;
+    border-radius: 4px;
+    border-style: none;
+    outline: none;
+    overflow: hidden;
+    text-align: center;
+    text-decoration: none;
+    padding: 5px 10px;
+    margin: 3px 0px;
 }
 
 .mainButton:hover {

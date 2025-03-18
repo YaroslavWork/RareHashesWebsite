@@ -8,6 +8,7 @@ app = Flask(__name__)
 MIN_REPEATED_SIGNS: int = 25
 MAX_USER_LENGTH: int = 31
 MAX_WORD_LENGTH: int = 255
+ROW_IN_ONE_PAGE_LIMIT: int = 100
 LOGIN: str = ''
 PASSWORD: str = ''
 ADDRESS: str = ''
@@ -36,7 +37,7 @@ def default():
 
 @app.route('/view')
 def view():
-    return redirect(url_for('view_with_params', page=1, created_at=1))
+    return redirect(url_for('view_with_params', page=1, created_at=-1))
 
 @app.route('/view/<int:page>')
 def view_with_params(page: int):
@@ -48,9 +49,10 @@ def view_with_params(page: int):
             sort_data.append((arg, 1))
         elif temp == '-1':
             sort_data.append((arg, -1))
-    result = list(collection.find().sort(sort_data).skip(100*(page-1)).limit(100))
+    result = list(collection.find().sort(sort_data).skip(ROW_IN_ONE_PAGE_LIMIT*(page-1)).limit(ROW_IN_ONE_PAGE_LIMIT))
+    count = collection.count_documents({})
 
-    return render_template('view.html', result=result)
+    return render_template('view.html', result=result, count=count, page=count//ROW_IN_ONE_PAGE_LIMIT+1)
 
 @app.route('/write', methods=['POST'])
 def write():
