@@ -23,6 +23,13 @@ body {
     height: auto; 
 }
 
+code {
+    font-size: 1.2rem;
+    text-align: left;
+    background-color: #0000000f;
+    border-radius: 5px;
+}
+
 #menu {
     display: flex;
     justify-content: space-between;
@@ -31,6 +38,18 @@ body {
 
 #logoText {
     font-weight: 600;
+}
+
+#clearProposition {
+    background-color:  #c58c42;
+    width: 100px;
+}
+
+#buttonPanel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 10px 20px 10px;
 }
 
 .content {
@@ -49,6 +68,27 @@ body {
 .thButtonsContainer {
     display: flex;
     flex-direction: column;
+}
+
+.textInput {
+    margin: 10px;
+    height: 1.25em;
+    text-align: left;
+    border-color: #4275c5;
+    background-color: #e2e7f0;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.selectInput {
+    margin: 10px;
+    height: 2em;
+    padding: 5px;
+    border-color: #4275c5;
+    background-color: #e2e7f0;
+    font-size: 1.1rem;
+    border-radius: 5px;
 }
 
 #mainContent {
@@ -73,6 +113,12 @@ body {
     font-size: 1.25rem;
 }
 
+#writeContent {
+    width: 50%;
+    margin: auto;
+    font-size: 1.25rem;
+}
+
 h3 {
     margin-top: 20px;
     margin-bottom: 5px;
@@ -86,6 +132,10 @@ h3 {
 
 #welcomeButton {
     background-color:  #c58c42;
+    margin-right: 10px;
+}
+
+#writeButton {
     margin-right: 10px;
 }
 

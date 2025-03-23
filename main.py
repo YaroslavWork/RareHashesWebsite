@@ -54,8 +54,11 @@ def view_with_params(page: int):
 
     return render_template('view.html', result=result, count=count, page=count//ROW_IN_ONE_PAGE_LIMIT+1)
 
-@app.route('/write', methods=['POST'])
+@app.route('/write', methods=['GET', 'POST'])
 def write():
+    if request.method == 'GET':
+        return render_template('write.html')
+    
     data = request.get_json()
     word: str = data.get('word', '')
     hashType: str = data.get('hashType', '')

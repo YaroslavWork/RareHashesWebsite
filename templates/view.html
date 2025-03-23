@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rarest Hashes - Welcome Page</title>
+    <title>Rarest Hashes - View</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
@@ -13,10 +13,8 @@
     <div id="header">
         <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
         <div id="menu">
-            <a href="{{ url_for('default')}}">
-                <button class="mainButton" id="welcomeButton">Welcome Page</button>
-            </a>
-            <button class="mainButton">Write</button>
+            <a href="{{ url_for('default') }}"><button class="mainButton" id="welcomeButton">Welcome Page</button></a>
+            <a href="{{ url_for('write') }}"><button class="mainButton" id="writeButton">Write</button></a>
         </div>
     </div>
     <div class="content" id="viewContent">
