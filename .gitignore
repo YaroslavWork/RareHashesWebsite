@@ -4,3 +4,4 @@ address.txt
 host.txt
 __pycache__/*
 static/images/*
+.env

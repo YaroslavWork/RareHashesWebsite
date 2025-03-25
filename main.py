@@ -2,25 +2,27 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 from pymongo import MongoClient
 from functions import *
 from datetime import datetime
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 app = Flask(__name__)
+
+app.config['DATABASE_IP_AND_PORT'] = os.getenv('DATABASE_IP_AND_PORT')
+app.config['DATABASE_LOGIN'] = os.getenv('DATABASE_LOGIN')
+app.config['DATABASE_PASSWORD'] = os.getenv('DATABASE_PASSWORD')
+app.config['HOST'] = os.getenv('HOST')
+app.config['DEBUG'] = os.getenv('DEBUG', 'False') == 'True'
 
 MIN_REPEATED_SIGNS: int = 25
 MAX_USER_LENGTH: int = 31
 MAX_WORD_LENGTH: int = 255
 ROW_IN_ONE_PAGE_LIMIT: int = 100
-LOGIN: str = ''
-PASSWORD: str = ''
-ADDRESS: str = ''
 
-with open('./login.txt', 'r') as file:
-    LOGIN = file.read().strip()
-with open('./password.txt', 'r') as file:
-    PASSWORD = file.read().strip()
-with open('./address.txt', 'r') as file:
-    ADDRESS = file.read().strip()
-
-MONGO_URI = f'mongodb://{LOGIN}:{PASSWORD}@{ADDRESS}/hashes?authSource=admin'
+MONGO_URI = f'mongodb://{app.config['DATABASE_LOGIN']}\
+:{app.config['DATABASE_PASSWORD']}@{app.config['DATABASE_IP_AND_PORT']}\
+/hashes?authSource=admin'
+print(MONGO_URI)
 
 # Connect to mongodb
 try:
@@ -103,10 +105,5 @@ def write():
         return jsonify({"msg": "Error inserting data: {e}"}), 500
 
 if __name__ == '__main__':
-    HOST = ''
-    PORT = ''
-    with open('host.txt', 'r') as file:
-        adress = file.read().strip()
-        HOST = adress.split(':')[0]
-        PORT = adress.split(':')[1]
-    app.run(host=HOST, port=PORT, debug=True)
+    IP, PORT = os.getenv('HOST').split(':')
+    app.run(host=IP, port=int(PORT), debug=app.config['DEBUG'])
