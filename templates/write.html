@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Rarest Hashes - Write</title>
+</head>
+<body>
+    <div id="header">
+        <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
+        <div id="menu">
+            <a href="{{ url_for('default') }}"><button class="mainButton" id="welcomeButton">Welcome Page</button></a>
+            <a href="{{ url_for('view') }}"><button class="mainButton" id="viewButton">View</button></a>
+        </div>
+    </div>
+    <div class="content" id="writeContent">
+        <h3>Submit your proposition:</h3>
+        <input type="text" class="textInput" placeholder="Enter a word...">
+        <select class="selectInput">
+            <option value="sha256">SHA256</option>
+        </select>
+        <input type="text" class="textInput" placeholder="Enter a user (optional)...">
+        <div id="buttonPanel">
+            <button class="mainButton" id="submitWrite">Submit</button>
+            <button class="mainButton" id="clearProposition">Clear</button>
+        </div>
+    </div>
+</body>
+</html>

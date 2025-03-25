@@ -20,9 +20,10 @@ async function computeHashes() {
     const rows = table.getElementsByTagName("tr");
 
     for (let i = 1; i < rows.length; i++) { // Skip header
+        rows[i].cells[0].textContent = i; // Count
         let firstText = rows[i].cells[0].textContent.trim(); // First column
         let hashValue_16 = await sha256(firstText, 16);
-        rows[i].cells[6].textContent = hashValue_16;
+        rows[i].cells[7].textContent = hashValue_16;
         // let hashValue_2 = await sha256(firstText, 2);
         // rows[i].cells[7].textContent = hashValue_2;
     }
