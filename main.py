@@ -49,7 +49,10 @@ def view_with_params(page: int):
             sort_data.append((arg, 1))
         elif temp == '-1':
             sort_data.append((arg, -1))
-    result = list(collection.find().sort(sort_data).skip(ROW_IN_ONE_PAGE_LIMIT*(page-1)).limit(ROW_IN_ONE_PAGE_LIMIT))
+    if sort_data:
+        result = list(collection.find().sort(sort_data).skip(ROW_IN_ONE_PAGE_LIMIT*(page-1)).limit(ROW_IN_ONE_PAGE_LIMIT))
+    else:
+        result = list(collection.find().skip(ROW_IN_ONE_PAGE_LIMIT*(page-1)).limit(ROW_IN_ONE_PAGE_LIMIT))
     count = collection.count_documents({})
 
     return render_template('view.html', result=result, count=count, page=count//ROW_IN_ONE_PAGE_LIMIT+1)
