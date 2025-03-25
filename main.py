@@ -22,7 +22,6 @@ ROW_IN_ONE_PAGE_LIMIT: int = 100
 MONGO_URI = f'mongodb://{app.config['DATABASE_LOGIN']}\
 :{app.config['DATABASE_PASSWORD']}@{app.config['DATABASE_IP_AND_PORT']}\
 /hashes?authSource=admin'
-print(MONGO_URI)
 
 # Connect to mongodb
 try:
