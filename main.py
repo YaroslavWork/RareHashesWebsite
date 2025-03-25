@@ -1,14 +1,18 @@
+import os
+import socket
+from datetime import datetime
+
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from pymongo import MongoClient
-from functions import *
-from datetime import datetime
 from dotenv import load_dotenv
-import os
+
+from functions import *
 
 load_dotenv()
 app = Flask(__name__)
 
 app.config['DATABASE_IP_AND_PORT'] = os.getenv('DATABASE_IP_AND_PORT')
+app.config['TELEGRAM_BOT_IP_AND_PORT'] = os.getenv('TELEGRAM_BOT_IP_AND_PORT')
 app.config['DATABASE_LOGIN'] = os.getenv('DATABASE_LOGIN')
 app.config['DATABASE_PASSWORD'] = os.getenv('DATABASE_PASSWORD')
 app.config['HOST'] = os.getenv('HOST')
@@ -18,6 +22,8 @@ MIN_REPEATED_SIGNS: int = 25
 MAX_USER_LENGTH: int = 31
 MAX_WORD_LENGTH: int = 255
 ROW_IN_ONE_PAGE_LIMIT: int = 100
+
+TELEGRAM_IP, TELEGRAM_PORT = app.config['TELEGRAM_BOT_IP_AND_PORT'].split(':')
 
 MONGO_URI = f'mongodb://{app.config['DATABASE_LOGIN']}\
 :{app.config['DATABASE_PASSWORD']}@{app.config['DATABASE_IP_AND_PORT']}\
@@ -89,19 +95,33 @@ def write():
     if repeated_counts < MIN_REPEATED_SIGNS:
         return jsonify({"msg": f"Your hash has lower that {MIN_REPEATED_SIGNS} repeated signs ({repeated_counts}). "}), 400
     
+    created_at = datetime.utcnow()
+
+    # Send to a telegram bot
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        client.connect((TELEGRAM_IP, int(TELEGRAM_PORT)))
+        client.sendall(f"{word}|NEXT|{True}|NEXT|{hashType}|NEXT|{repeated_counts}|NEXT|{user}|NEXT|{created_at}\n").encode('utf-8')
+        client.close()
+    except ConnectionRefusedError as e:
+        print(f"Connection Refused: {e}")
+
     # Writing to a database
     write_data = {  "word": word,
                     "isFromBeggining": True,
                     "counts": repeated_counts,
                     "hashType": hashType,
                     "user": user,
-                    "created_at": datetime.utcnow()
+                    "created_at": created_at
                     }
+    
     try:
         collection.insert_one(write_data)
         return jsonify({"msg": "Hash is successfully added."}), 201
     except Exception as e:
         return jsonify({"msg": "Error inserting data: {e}"}), 500
+    
+    
 
 if __name__ == '__main__':
     IP, PORT = os.getenv('HOST').split(':')
