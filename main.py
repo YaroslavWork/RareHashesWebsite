@@ -101,7 +101,7 @@ def write():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         client.connect((TELEGRAM_IP, int(TELEGRAM_PORT)))
-        client.sendall(f"{word}|NEXT|{True}|NEXT|{hashType}|NEXT|{repeated_counts}|NEXT|{user}|NEXT|{created_at}\n").encode('utf-8')
+        client.sendall(f"{word}|NEXT|{True}|NEXT|{hashType}|NEXT|{repeated_counts}|NEXT|{user}|NEXT|{created_at}\n".encode('utf-8'))
         client.close()
     except ConnectionRefusedError as e:
         print(f"Connection Refused: {e}")
