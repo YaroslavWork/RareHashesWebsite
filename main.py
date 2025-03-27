@@ -104,6 +104,7 @@ def write():
         client.sendall(f"{word}|NEXT|{True}|NEXT|{hashType}|NEXT|{repeated_counts}|NEXT|{user}|NEXT|{created_at}\n".encode('utf-8'))
         client.close()
     except ConnectionRefusedError as e:
+        
         print(f"Connection Refused: {e}")
 
     # Writing to a database
@@ -125,4 +126,7 @@ def write():
 
 if __name__ == '__main__':
     IP, PORT = os.getenv('HOST').split(':')
-    app.run(host=IP, port=int(PORT), debug=app.config['DEBUG'])
+    app.run(host=IP,
+            port=int(PORT),
+            debug=app.config['DEBUG'],
+            ssl_context=('./ssl/rareHashes.crt', './ssl/rareHashes.key'))

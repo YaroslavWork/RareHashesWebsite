@@ -11,5 +11,6 @@ COPY functions.py .
 COPY .env .
 COPY ./static ./static
 COPY ./templates ./templates
+COPY ./ssl ./ssl
 
 CMD ["python", "./main.py"]

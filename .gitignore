@@ -1,7 +1,4 @@
-login.txt
-password.txt
-address.txt
-host.txt
 __pycache__/*
 static/images/*
 .env
+ssl/*
