@@ -1,6 +1,7 @@
 import os
 import socket
 from datetime import datetime
+import ssl
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from pymongo import MongoClient
@@ -17,6 +18,7 @@ app.config['DATABASE_LOGIN'] = os.getenv('DATABASE_LOGIN')
 app.config['DATABASE_PASSWORD'] = os.getenv('DATABASE_PASSWORD')
 app.config['HOST'] = os.getenv('HOST')
 app.config['DEBUG'] = os.getenv('DEBUG', 'False') == 'True'
+app.config['PEM_PASS'] = os.getenv('PEM_PASS')
 
 MIN_REPEATED_SIGNS: int = 25
 MAX_USER_LENGTH: int = 31
@@ -126,7 +128,9 @@ def write():
 
 if __name__ == '__main__':
     IP, PORT = os.getenv('HOST').split(':')
+    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    ssl_context.load_cert_chain('./ssl/rareHashes.crt', './ssl/rareHashes.key', password=app.config['PEM_PASS'])
     app.run(host=IP,
             port=int(PORT),
             debug=app.config['DEBUG'],
-            ssl_context=('./ssl/rareHashes.crt', './ssl/rareHashes.key'))
+            ssl_context=ssl_context)
