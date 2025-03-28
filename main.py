@@ -86,7 +86,10 @@ def write():
     if not hashType or hashType != 'sha256':
         return jsonify({"msg": "You need to provide a 'hashType' (Current support: sha256)."}), 400
     if collection.find_one({"word": word}):
-        return jsonify({"msg": "This hash is already in database."}), 400
+        return jsonify({
+            "errno": 1,
+            "msg": "This hash is already in database."
+        }), 400
 
     # Find hash
     hash_in_hex = get_sha256_hash(word)
@@ -95,7 +98,10 @@ def write():
 
     # Validation (2/2) Checking if hash actual a rare one
     if repeated_counts < MIN_REPEATED_SIGNS:
-        return jsonify({"msg": f"Your hash has lower that {MIN_REPEATED_SIGNS} repeated signs ({repeated_counts}). "}), 400
+        return jsonify({
+            "errno": 2,
+            "msg": f"Your hash has lower that {MIN_REPEATED_SIGNS} repeated signs ({repeated_counts}). "
+        }), 400
     
     created_at = datetime.utcnow()
 
@@ -120,9 +126,14 @@ def write():
     
     try:
         collection.insert_one(write_data)
-        return jsonify({"msg": "Hash is successfully added."}), 201
+        return jsonify({
+            "errno": 0,
+            "msg": "Hash is successfully added."
+        }), 201
     except Exception as e:
-        return jsonify({"msg": "Error inserting data: {e}"}), 500
+        return jsonify({
+            "errno": 3,
+            "msg": "Database is currently unavailable. Please try again later."}), 500
     
     
 

@@ -19,15 +19,19 @@
     </div>
     <div class="content" id="writeContent">
         <h3>Submit your proposition:</h3>
-        <input type="text" class="textInput" placeholder="Enter a word...">
-        <select class="selectInput">
+        <input type="text" class="textInput" id="wordInput" placeholder="Enter a word...">
+        <select class="selectInput" id="hashTypeInput">
+            <option value="" disabled selected>Select a hash type...</option>
             <option value="sha256">SHA256</option>
         </select>
-        <input type="text" class="textInput" placeholder="Enter a user (optional)...">
+        <input type="text" class="textInput" id="userInput" placeholder="Enter a user (optional)...">
         <div id="buttonPanel">
-            <button class="mainButton" id="submitWrite">Submit</button>
-            <button class="mainButton" id="clearProposition">Clear</button>
+            <button class="mainButton" id="submitWrite" onclick="sendData()">Submit</button>
+            <p id="errorParagraph"></p>
+            <button class="mainButton" id="clearProposition" onclick="clearInputs()">Clear</button>
         </div>
     </div>
+
+    <script src="{{ url_for('static', filename='write.js') }}"></script>
 </body>
 </html>
