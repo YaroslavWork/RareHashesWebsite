@@ -13,6 +13,7 @@
     <div id="header">
         <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
         <div id="menu">
+            <a href="{{ url_for('telegram_notification_write') }}"><button class="mainButton" id="telegramButton">Telegram Notification</button></a>
             <a href="{{ url_for('default') }}"><button class="mainButton" id="welcomeButton">Welcome Page</button></a>
             <a href="{{ url_for('write') }}"><button class="mainButton" id="writeButton">Write</button></a>
         </div>
@@ -52,8 +53,6 @@
                         <button class="smallFilterButton">&darr;</button>
                     </div>
                 </div></th>
-                <th>Hash (in hex)</th>
-                <!-- <th>Hash (in dec)</th> -->
             </tr>
             {% for item in result %}
             <tr>
@@ -64,9 +63,6 @@
                 <td>{{ item.counts }}</td>
                 <td>{{ item.user }}</td>
                 <td>{{ item.created_at }}</td>
-                <td>[Empty]</td>
-                <!-- <td>[Empty]</td> -->
-                
             </tr>
             {% endfor %}
         </table>

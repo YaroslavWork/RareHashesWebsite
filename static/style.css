@@ -142,6 +142,11 @@ h3 {
     margin-right: 10px;
 }
 
+#telegramButton {
+    background-color: #00aeed;
+    margin-right: 10px;
+}
+
 #writeButton {
     margin-right: 10px;
 }

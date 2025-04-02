@@ -13,13 +13,14 @@
     <div id="header">
         <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
         <div id="menu">
+            <a href="{{ url_for('telegram_notification_write') }}"><button class="mainButton" id="telegramButton">Telegram Notification</button></a>
             <a href="{{ url_for('view') }}"><button class="mainButton" id="viewButton">View</button></a>
             <a href="{{ url_for('write') }}"><button class="mainButton" id="writeButton">Write</button></a>
         </div>
     </div>
     <div class="content" id="mainContent">
         <h3>About:</h3>
-        <p>Project <span id="logoText">"Rarest Hashes"</span> was created to find rare repeated values ​​in hashes.</p>
+        <p>Project <span id="logoText">"Rare Hashes"</span> was created to find rare repeated values ​​in hashes.</p>
         <p>The rarity is to find a repeating pattern (0 or 1) at the beginning or end of the hash. The minimum hash that is accepted for saving in the database must have no less than 25 repeating characters.</p>
         <p>You can save this hash using a word that turns into this hash. On the server side, it is checked whether the hash is really rare and if successful, it is saved to the database along with the (optional) nickname</p>
         <h3>Methods to write your hash:</h3>

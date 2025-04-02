@@ -66,6 +66,12 @@ def view_with_params(page: int):
 
     return render_template('view.html', result=result, count=count, page=count//ROW_IN_ONE_PAGE_LIMIT+1)
 
+@app.route('/add_telegram_user', methods=['GET', 'POST'])
+def telegram_notification_write():
+    if request.method == 'GET':
+        return "In progress..."
+
+
 @app.route('/write', methods=['GET', 'POST'])
 def write():
     if request.method == 'GET':
