@@ -8,6 +8,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 from functions import *
+from database import Database
 
 load_dotenv()
 app = Flask(__name__)
@@ -24,21 +25,20 @@ MIN_REPEATED_SIGNS: int = 25
 MAX_USER_LENGTH: int = 31
 MAX_WORD_LENGTH: int = 255
 ROW_IN_ONE_PAGE_LIMIT: int = 100
-
 TELEGRAM_IP, TELEGRAM_PORT = app.config['TELEGRAM_BOT_IP_AND_PORT'].split(':')
 
-MONGO_URI = f'mongodb://{app.config['DATABASE_LOGIN']}\
-:{app.config['DATABASE_PASSWORD']}@{app.config['DATABASE_IP_AND_PORT']}\
-/hashes?authSource=admin'
+# MONGO_URI = f'mongodb://{app.config['DATABASE_LOGIN']}\
+# :{app.config['DATABASE_PASSWORD']}@{app.config['DATABASE_IP_AND_PORT']}\
+# /hashes?authSource=admin'
 
-# Connect to mongodb
-try:
-    client = MongoClient(MONGO_URI)
-    db = client.get_database()
-    collection = db["hashes"]
-    print("Connected to MongoDB")
-except ConnectionError as e:
-    print(f"Error connecting to MongoDB: {e}")
+# # Connect to mongodb
+# try:
+#     client = MongoClient(MONGO_URI)
+#     db = client.get_database()
+#     collection = db["hashes"]
+#     print("Connected to MongoDB")
+# except ConnectionError as e:
+#     print(f"Error connecting to MongoDB: {e}")
 
 @app.route('/')
 def default():
@@ -52,17 +52,22 @@ def view():
 def view_with_params(page: int):
     sort_data = []
     sort_args = ['word, isFromBeggining', 'counts', 'hashType', 'user', 'created_at']
+    
     for arg in sort_args:
         temp = request.args.get(arg, '0')
         if temp == '1':
             sort_data.append((arg, 1))
         elif temp == '-1':
             sort_data.append((arg, -1))
+
     if sort_data:
-        result = list(collection.find().sort(sort_data).skip(ROW_IN_ONE_PAGE_LIMIT*(page-1)).limit(ROW_IN_ONE_PAGE_LIMIT))
-    else:
-        result = list(collection.find().skip(ROW_IN_ONE_PAGE_LIMIT*(page-1)).limit(ROW_IN_ONE_PAGE_LIMIT))
-    count = collection.count_documents({})
+        result = database.find(
+            query={},
+            sort=sort_data,
+            skip=ROW_IN_ONE_PAGE_LIMIT*(page-1),
+            limit=ROW_IN_ONE_PAGE_LIMIT
+        )
+    count = database.count()
 
     return render_template('view.html', result=result, count=count, page=count//ROW_IN_ONE_PAGE_LIMIT+1)
 
@@ -91,7 +96,7 @@ def write():
         return jsonify({"msg": f"You reach the max length of the user. Max length is {MAX_USER_LENGTH} (Your: {len(user)})."}), 400
     if not hashType or hashType != 'sha256':
         return jsonify({"msg": "You need to provide a 'hashType' (Current support: sha256)."}), 400
-    if collection.find_one({"word": word}):
+    if database.find_one(query={"word": word}):
         return jsonify({
             "errno": 1,
             "msg": "This hash is already in database."
@@ -131,7 +136,7 @@ def write():
                     }
     
     try:
-        collection.insert_one(write_data)
+        database.insert_one(query=write_data)
         return jsonify({
             "errno": 0,
             "msg": "Hash is successfully added."
@@ -144,6 +149,18 @@ def write():
     
 
 if __name__ == '__main__':
+    database = Database(
+        login=app.config['DATABASE_LOGIN'],
+        ip_and_port=app.config['DATABASE_IP_AND_PORT']
+    )
+
+    database.connect(password=app.config['DATABASE_PASSWORD'])
+
+    if database.is_connected():
+        database.set_active_collection('hashes')
+    else:
+        exit(-1)
+
     IP, PORT = os.getenv('HOST').split(':')
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     ssl_context.load_cert_chain('./ssl/rareHashes.crt', './ssl/rareHashes.key', password=app.config['PEM_PASS'])
