@@ -31,7 +31,6 @@ class Database:
     
     def connect(self, password: str) -> None:
         MONGO_URI = f'mongodb://{self.__login}:{password}@{self.__ip_and_port}/{Database.DATABASE_NAME}?authSource=admin'
-        print(MONGO_URI)
         
         try:
             self.__client = MongoClient(MONGO_URI)
