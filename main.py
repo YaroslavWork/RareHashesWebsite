@@ -69,7 +69,7 @@ def view_with_params(page: int):
         )
     count = database.count()
 
-    return render_template('view.html', result=result, count=count, page=count//ROW_IN_ONE_PAGE_LIMIT+1)
+    return render_template('view.html', result=result, count=count, start_count=int((page-1)*ROW_IN_ONE_PAGE_LIMIT)+1)
 
 @app.route('/add_telegram_user', methods=['GET', 'POST'])
 def telegram_notification_write():
