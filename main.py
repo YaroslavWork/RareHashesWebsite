@@ -27,19 +27,6 @@ MAX_WORD_LENGTH: int = 255
 ROW_IN_ONE_PAGE_LIMIT: int = 100
 TELEGRAM_IP, TELEGRAM_PORT = app.config['TELEGRAM_BOT_IP_AND_PORT'].split(':')
 
-# MONGO_URI = f'mongodb://{app.config['DATABASE_LOGIN']}\
-# :{app.config['DATABASE_PASSWORD']}@{app.config['DATABASE_IP_AND_PORT']}\
-# /hashes?authSource=admin'
-
-# # Connect to mongodb
-# try:
-#     client = MongoClient(MONGO_URI)
-#     db = client.get_database()
-#     collection = db["hashes"]
-#     print("Connected to MongoDB")
-# except ConnectionError as e:
-#     print(f"Error connecting to MongoDB: {e}")
-
 @app.route('/')
 def default():
     return render_template('index.html')
