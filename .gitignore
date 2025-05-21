@@ -1,4 +1,4 @@
-__pycache__/*
-static/images/*
+**/__pycache__/
+app/static/images/*
 .env
 ssl/*

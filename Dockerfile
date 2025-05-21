@@ -7,11 +7,8 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY main.py .
-COPY database.py .
-COPY functions.py .
+COPY ./app ./app
 COPY .env .
-COPY ./static ./static
-COPY ./templates ./templates
 COPY ./ssl ./ssl
 
 CMD ["python", "./main.py"]

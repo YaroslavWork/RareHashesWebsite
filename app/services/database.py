@@ -6,6 +6,7 @@ class Database:
     COLLECTION_NAME = 'hashes'
 
     def __init__(self, login: str, ip_and_port: str) -> None:
+
         self.__login: str = login
         self.__ip_and_port: str = ip_and_port
         
@@ -64,3 +65,4 @@ class Database:
     
     def count(self, query: dict = {}) -> int:
         return self.__active_collection.count_documents(query)
+
