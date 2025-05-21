@@ -10,7 +10,7 @@ The project is part of a system consisting (microservices) of three components:
 
 - A web interface displaying the rarest hashes found.
 
-- A [Telegram bot](https://github.com/YaroslavWork/RareHashesTelegramBot) that notifies users about new rare hashes.
+- A [telegram bot](https://github.com/YaroslavWork/RareHashesTelegramBot) that notifies users about new rare hashes.
 
 - An [automated searching bot](https://github.com/YaroslavWork/RareHashFinder) that scans and uploads rare hashes to the database.
 
@@ -99,13 +99,13 @@ This combination highlights advanced backend processing , database management, a
     ```
 
     This configuration file contains:
-    - ```DATABASE_IP_AND_PORT``` - connection to mongoDB database. This database must have collection 'hashes'.
-    - ```TELEGRAM_BOT_IP_AND_PORT``` - my other project to connects telegram bot and send notifications in case if users need.
-    - ```DATABASE_LOGIN``` - login to mongoDB
-    - ```DATABASE_PASSWORD``` - password to mongoDB
-    - ```HOST``` - site domain
-    - ```DEBUG``` - debugging for developers
-    - ```PEM_PASS``` - https conection password
+    - ```DATABASE_IP_AND_PORT``` - connection to mongoDB database. This database must have collection 'hashes';
+    - ```TELEGRAM_BOT_IP_AND_PORT``` - my other project to connects telegram bot and send notifications in case if users need;
+    - ```DATABASE_LOGIN``` - login to mongoDB;
+    - ```DATABASE_PASSWORD``` - password to mongoDB;
+    - ```HOST``` - site domain;
+    - ```DEBUG``` - debugging for developers;
+    - ```PEM_PASS``` - https conection password.
 
 7. Create an ssl sertificates:
 
