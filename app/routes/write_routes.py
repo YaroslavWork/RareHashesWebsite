@@ -33,7 +33,7 @@ def write():
     if len(hash.word) > max_word_length:
         return jsonify({"msg": f"You reach the max length of the word. Max length is {max_word_length} (Your: {len(hash.word)})."}), 400
     if len(hash.user) > max_user_length:
-        return jsonify({"msg": f"You reach the max length of the user. Max length is {max_word_length} (Your: {len(uhash.ser)})."}), 400
+        return jsonify({"msg": f"You reach the max length of the user. Max length is {max_word_length} (Your: {len(hash.ser)})."}), 400
     if hash.hashType is None or hash.hashType != 'sha256':
         return jsonify({"msg": "You need to provide a 'hashType' (Current support: sha256)."}), 400
     if database.find_one(query={"word": hash.word}):
