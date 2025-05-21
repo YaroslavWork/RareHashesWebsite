@@ -2,7 +2,7 @@ from flask import request, render_template, jsonify, Blueprint, current_app
 from datetime import datetime
 import socket
 
-from app.models.functions import get_sha256_hash, convert_hex_to_binary, count_repeated_pattern_from_start
+from app.utils.hash_utils import get_sha256_hash, convert_hex_to_binary, count_repeated_pattern_from_start
 
 write_bp = Blueprint("write", __name__)
 
