@@ -3,12 +3,12 @@ import datetime
 class Hash:
     ignore_vars = ['user']
 
-    def __init__(self, word=None, isFromBeggining=None, counts=None, hashType=None, created_at=None, user=None):
+    def __init__(self, word=None, isFromBeginning=None, counts=None, hashType=None, createdAt=None, user=None):
         self.word: str | None = word
-        self.isFromBeggining: bool | None = isFromBeggining
+        self.isFromBeginning: bool | None = isFromBeginning
         self.counts: int | None = counts
         self.hashType: str | None = hashType
-        self.created_at: datetime.datetime | None = created_at
+        self.createdAt: datetime.datetime | None = createdAt
         self.user: str | None = user
 
     def is_complete(self):
@@ -25,6 +25,12 @@ class Hash:
                 setattr(self, key, value)
             except AttributeError:
                 print(f"Not finding a {key}: {value}.")
+
+    def __str__(self):
+        string = "Hash:"
+        for key, value in vars(self).items():
+            string += f"{key}: {value}; "
+        return string
 
 
 # Testing

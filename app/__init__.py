@@ -1,8 +1,14 @@
 from flask import Flask
 from dotenv import load_dotenv
 import os
+import asyncio
+import threading
 
 from app.services.database import Database
+from app.services.telegram_api import TelegramAPI
+
+def start_telegramAPI_loop(telegramAPI, password):
+    asyncio.run(telegramAPI.open_connection(password))
 
 
 def create_app():
@@ -11,12 +17,14 @@ def create_app():
     # --- Load .env ---
     load_dotenv()
     app.config['DATABASE_IP_AND_PORT'] = os.getenv('DATABASE_IP_AND_PORT')
-    app.config['TELEGRAM_BOT_IP_AND_PORT'] = os.getenv('TELEGRAM_BOT_IP_AND_PORT')
     app.config['DATABASE_LOGIN'] = os.getenv('DATABASE_LOGIN')
     app.config['DATABASE_PASSWORD'] = os.getenv('DATABASE_PASSWORD')
     app.config['HOST'] = os.getenv('HOST')
     app.config['DEBUG'] = os.getenv('DEBUG', 'False') == 'True'
     app.config['PEM_PASS'] = os.getenv('PEM_PASS')
+    app.config['RABBIT_LOGIN'] = os.getenv('RABBIT_LOGIN')
+    app.config['RABBIT_PASSWORD'] = os.getenv('RABBIT_PASSWORD')
+    app.config['RABBIT_HOST'] = os.getenv('RABBIT_HOST')
 
     # --- Constants ---
     app.config['MIN_REPEATED_SIGNS'] = 25
@@ -33,6 +41,13 @@ def create_app():
     database.connect(password=app.config['DATABASE_PASSWORD'])
     database.set_active_collection('hashes')
     app.config['DATABASE'] = database
+
+    # --- TelegramAPI configuration ---
+    telegramAPI = TelegramAPI(rabbit_login=app.config['RABBIT_LOGIN'], rabbit_host=app.config['RABBIT_HOST'])
+    telegramAPI_thread = threading.Thread(target=start_telegramAPI_loop, args=(telegramAPI, app.config['RABBIT_PASSWORD']))
+    telegramAPI_thread.start()
+    app.config['TELEGRAMAPI'] = telegramAPI
+    print("TelegramAPI is running...")
 
     # --- Register blueprints ---
     from app.routes.main_routes import main_bp

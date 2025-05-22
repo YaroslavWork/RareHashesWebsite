@@ -1,6 +1,6 @@
 from flask import request, render_template, jsonify, Blueprint, current_app
 from datetime import datetime
-import socket
+import asyncio
 
 from app.utils.hash_utils import get_sha256_hash, convert_hex_to_binary, count_repeated_pattern_from_start
 from app.database_utils.hash_database_utils import add_hash_to_database
@@ -17,13 +17,13 @@ def write():
     max_user_length = current_app.config['MAX_USER_LENGTH']
     min_repeated_signs = current_app.config['MIN_REPEATED_SIGNS']
     database = current_app.config['DATABASE']
-    telegram_ip, telegram_port = current_app.config['TELEGRAM_BOT_IP_AND_PORT'].split(':')
+    telegramAPI = current_app.config['TELEGRAMAPI']
 
     hash = Hash()
 
     data = request.get_json()
     hash.word = data.get('word', None)
-    hash.isFromBeggining = True
+    hash.isFromBeginning = True
     hash.hashType = data.get('hashType', None)
     hash.user = data.get('user', None)
 
@@ -54,21 +54,16 @@ def write():
             "msg": f"Your hash has lower that {min_repeated_signs} repeated signs ({hash.counts}). "
         }), 400
     
-    hash.created_at = datetime.utcnow()
+    hash.createdAt = datetime.utcnow()
 
+    print(hash)
     if not hash.is_complete():
         return jsonify({
             "errno": 3,
-            "msg": "Your hash is not complete"}), 400
+            "msg": "Something wrong with the code. Try later..."}), 400
 
     # Send to a telegram bot
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        client.connect((telegram_ip, int(telegram_port)))
-        client.sendall(f"{hash.word}|NEXT|{True}|NEXT|{hash.hashType}|NEXT|{hash.counts}|NEXT|{hash.user}|NEXT|{hash.created_at}\n".encode('utf-8'))
-        client.close()
-    except ConnectionRefusedError as e:
-        print(f"Connection Refused: {e}")
+    telegramAPI.notify(hash, 100)
 
     try:
         add_hash_to_database(database=database, hash=hash)

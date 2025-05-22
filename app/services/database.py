@@ -37,16 +37,16 @@ class Database:
             self.__client = MongoClient(MONGO_URI)
             self.__database = self.__client.get_database()
             self.__is_connected = True
-            print("Connected to MongoDB")
+            print("Database: Connected to MongoDB")
         except ConnectionError as e:
             self.__is_connected = False
-            print(f"Error connecting to MongoDB: {e}")
+            print(f"Databas: Error connecting to MongoDB: {e}")
 
     def find(self, query: dict, sort: list = None, skip: int = 0, limit: int = 0) -> list:
         if not self.is_connected:
-            raise ConnectionError("Not connected to the database.")
+            raise ConnectionError("Database: Not connected to the database.")
         if self.__active_collection is None:
-            raise ValueError("Active collection is not set.")
+            raise ValueError("Database: Active collection is not set.")
         
         cursor = self.__active_collection.find(query)
         if sort:
