@@ -3,7 +3,7 @@ from datetime import datetime
 import asyncio
 
 from app.utils.hash_utils import get_sha256_hash, convert_hex_to_binary, count_repeated_pattern_from_start
-from app.database_utils.hash_database_utils import add_hash_to_database
+from app.database_utils.hash_database_utils import add_hash_to_database, how_many_hashes_above
 from app.models.hash import Hash
 
 write_bp = Blueprint("write", __name__)
@@ -56,14 +56,16 @@ def write():
     
     hash.createdAt = datetime.utcnow()
 
-    print(hash)
     if not hash.is_complete():
         return jsonify({
             "errno": 3,
             "msg": "Something wrong with the code. Try later..."}), 400
+    
+    # Top for this hash
+    top: int = how_many_hashes_above(database=database, border=hash.counts) + 1
 
     # Send to a telegram bot
-    telegramAPI.notify(hash, 100)
+    telegramAPI.notify(hash, top)
 
     try:
         add_hash_to_database(database=database, hash=hash)
