@@ -1,3 +1,4 @@
-flask
-pymongo
-dotenv
+flask==3.1.1
+pymongo==4.13.0
+dotenv==0.9.9
+aio_pika==9.5.5
