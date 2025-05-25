@@ -39,7 +39,6 @@ def create_app():
     )   
 
     database.connect(password=app.config['DATABASE_PASSWORD'])
-    database.set_active_collection('hashes')
     app.config['DATABASE'] = database
 
     # --- TelegramAPI configuration ---

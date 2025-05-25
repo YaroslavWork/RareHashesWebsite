@@ -11,7 +11,6 @@ def add_hash_to_database(database: Database, hash: Hash) -> None:
     """
 
     write_data = hash.to_dict()
-    print(write_data)
     database.set_active_collection('hashes')
     database.insert_one(query=write_data)
 
@@ -32,3 +31,34 @@ def how_many_hashes_above(database: Database, border: int) -> int:
     count = database.count(query={"counts": {"$gt": border}})
 
     return count
+
+
+def get_hashes_in_ranges(database: Database, start_index: int, end_index: int, sort_data: list=[]) -> list[Hash]:
+    """
+    Retrieve a list of Hash objects from the database within a specified range and sorted by given criteria.
+
+    Args:
+        database (Database): The database service instance.
+        start_index (int): The number of documents to skip (offset).
+        end_index (int): The maximum number of documents to return (limit).
+        sort_data (list, optional): Sorting criteria as a list of tuples, e.g.  [(counts, -1), (createdAt, 1)]. Defaults to [].
+
+    Returns:
+        list[Hash]: A list of Hash instances retrieved from the database.
+    """
+
+    database.set_active_collection('hashes')
+    results: dict = database.find(
+            query={},
+            sort=sort_data,
+            skip=start_index,
+            limit=end_index
+        )
+    
+    hashes: list[Hash] = []
+    for result in results:
+        hash = Hash()
+        hash.from_dict(result)
+        hashes.append(hash)
+    
+    return hashes
