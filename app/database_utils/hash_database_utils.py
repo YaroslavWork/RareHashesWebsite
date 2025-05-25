@@ -62,3 +62,22 @@ def get_hashes_in_ranges(database: Database, start_index: int, end_index: int, s
         hashes.append(hash)
     
     return hashes
+
+
+def is_hash_in_database(database: Database, word: str) -> bool:
+    """
+    Search in the database if this hash is already exists.
+
+    Args:
+        database (Database): The database service instance.
+        word (str): The hash word
+
+    Returns:
+        bool: Return True if hash is already in the database.
+    """
+
+    database.set_active_collection('hashes')
+    result = database.find_one(query={"word": word})
+    if not result:
+        return False
+    return True

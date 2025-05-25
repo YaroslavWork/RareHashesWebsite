@@ -1,6 +1,8 @@
 from pymongo import MongoClient
 from pymongo.synchronous.collection import Collection 
 
+from app.utils.notification import log
+
 class Database:
     DATABASE_NAME = 'hashes'
     COLLECTION_NAME = 'hashes'
@@ -37,10 +39,10 @@ class Database:
             self.__client = MongoClient(MONGO_URI)
             self.__database = self.__client.get_database()
             self.__is_connected = True
-            print("Database: Connected to MongoDB")
+            log("Database", "Connected to MongoDB")
         except ConnectionError as e:
             self.__is_connected = False
-            print(f"Databas: Error connecting to MongoDB: {e}")
+            log("Database", f"Error connecting to MongoDB: {e}")
 
     def find(self, query: dict, sort: list = None, skip: int = 0, limit: int = 0) -> list:
         if not self.is_connected:

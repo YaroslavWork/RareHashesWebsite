@@ -1,5 +1,7 @@
 import datetime
 
+from app.utils.notification import log
+
 class Hash:
     ignore_vars = ['user']
 
@@ -24,7 +26,7 @@ class Hash:
             try:
                 setattr(self, key, value)
             except AttributeError:
-                print(f"Not finding a {key}: {value}.")
+                log("HashModel", f"Not finding a {key}: {value}.")
 
     def __str__(self):
         string = "Hash:"

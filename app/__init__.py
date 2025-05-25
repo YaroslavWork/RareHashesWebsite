@@ -1,14 +1,20 @@
 from flask import Flask
 from dotenv import load_dotenv
+import time
 import os
 import asyncio
 import threading
 
 from app.services.database import Database
 from app.services.telegram_api import TelegramAPI
+from app.utils.notification import log
 
 def start_telegramAPI_loop(telegramAPI, password):
-    asyncio.run(telegramAPI.open_connection(password))
+    while True:
+        if not telegramAPI.is_open():
+            log("TelegramAPI", "Connect to server...")
+            asyncio.run(telegramAPI.open_connection(password))
+        time.sleep(30)
 
 
 def create_app():
@@ -46,7 +52,6 @@ def create_app():
     telegramAPI_thread = threading.Thread(target=start_telegramAPI_loop, args=(telegramAPI, app.config['RABBIT_PASSWORD']))
     telegramAPI_thread.start()
     app.config['TELEGRAMAPI'] = telegramAPI
-    print("TelegramAPI is running...")
 
     # --- Register blueprints ---
     from app.routes.main_routes import main_bp

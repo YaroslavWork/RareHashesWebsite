@@ -4,6 +4,7 @@ import aio_pika
 from datetime import datetime
 
 from app.models.hash import Hash
+from app.utils.notification import log
 
 class TelegramAPI:
 
@@ -36,7 +37,7 @@ class TelegramAPI:
             while True:
                 await asyncio.sleep(2)
         except:
-            print("TelegramAPI: Connection failed")
+            log("TelegramAPI", "Connection failed")
             return
 
     async def __handle_incoming(self, channel):
@@ -46,18 +47,14 @@ class TelegramAPI:
                 async with message.process():
                     message = message.body.decode()
                     self.__queue_income.append(message)
-                    #now = datetime.now()
-                    #formatted = now.strftime("%d.%m.%Y %H:%M:%S.") + f"{now.microsecond:03d}"
-                    #print(f"({formatted}) Receive: {message}")
+                    #log("TelegramAPI", f"Receive: {message}")
 
     async def __send_message(self, channel):
         while True:
             for message in self.__queue_outcome:
                 msg = aio_pika.Message(body=message.encode())
                 await channel.default_exchange.publish(msg, routing_key="website_to_telegram")
-                #now = datetime.now()
-                #formatted = now.strftime("%d.%m.%Y %H:%M:%S.") + f"{now.microsecond:03d}"
-                #print(f"({formatted}) Send: {message}")
+                #log("TelegramAPI", f"Send: {message}")
             self.__queue_outcome = []
             await asyncio.sleep(2)
 
@@ -83,4 +80,4 @@ class TelegramAPI:
         if hash.is_complete():
             self.__queue_outcome.append(f'|NEW|{hash.word}|NEXT|{hash.isFromBeginning}|NEXT|{hash.hashType}|NEXT|{hash.counts}|NEXT|{hash.user}|NEXT|{hash.createdAt}|NEXT|{top}')
         else:
-            print('TelegramAPI: hash is not complete')
+            log("TelegramAPI", "Hash is not complete")

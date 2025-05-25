@@ -3,7 +3,7 @@ from datetime import datetime
 import asyncio
 
 from app.utils.hash_utils import get_sha256_hash, convert_hex_to_binary, count_repeated_pattern_from_start
-from app.database_utils.hash_database_utils import add_hash_to_database, how_many_hashes_above
+from app.database_utils.hash_database_utils import add_hash_to_database, how_many_hashes_above, is_hash_in_database
 from app.models.hash import Hash
 
 write_bp = Blueprint("write", __name__)
@@ -36,7 +36,7 @@ def write():
         return jsonify({"msg": f"You reach the max length of the user. Max length is {max_word_length} (Your: {len(hash.ser)})."}), 400
     if hash.hashType is None or hash.hashType != 'sha256':
         return jsonify({"msg": "You need to provide a 'hashType' (Current support: sha256)."}), 400
-    if database.find_one(query={"word": hash.word}):
+    if is_hash_in_database(database, hash.word):
         return jsonify({
             "errno": 1,
             "msg": "This hash is already in database."
