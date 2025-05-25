@@ -81,3 +81,18 @@ def is_hash_in_database(database: Database, word: str) -> bool:
     if not result:
         return False
     return True
+
+
+def count_all_hashes(database: Database) -> int:
+    """
+    Counts all hash entries in the 'hashes' collection of the database.
+
+    Args:
+        database (Database): The database service instance.
+
+    Returns:
+        int: The total number of hashes stored in the database.
+    """
+
+    database.set_active_collection('hashes')
+    database.count()

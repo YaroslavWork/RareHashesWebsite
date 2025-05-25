@@ -68,3 +68,5 @@ class Database:
     def count(self, query: dict = {}) -> int:
         return self.__active_collection.count_documents(query)
 
+    def delete_one(self, filter: dict = {}):
+        self.__active_collection.delete_one(filter)

@@ -8,8 +8,12 @@ from app.models.hash import Hash
 
 write_bp = Blueprint("write", __name__)
 
+
 @write_bp.route('/write', methods=['GET', 'POST'])
 def write():
+    """GET: Write route [/write]: Hash form;
+    POST: Write route [/write] {[word, user, hashType]}: Hash form"""
+
     if request.method == 'GET':
         return render_template('write.html')
     
@@ -32,8 +36,8 @@ def write():
         return jsonify({"msg": "You need to provide a 'word'."}), 400
     if len(hash.word) > max_word_length:
         return jsonify({"msg": f"You reach the max length of the word. Max length is {max_word_length} (Your: {len(hash.word)})."}), 400
-    if len(hash.user) > max_user_length:
-        return jsonify({"msg": f"You reach the max length of the user. Max length is {max_word_length} (Your: {len(hash.ser)})."}), 400
+    if hash.user and len(hash.user) > max_user_length:
+        return jsonify({"msg": f"You reach the max length of the user. Max length is {max_user_length} (Your: {len(hash.user)})."}), 400
     if hash.hashType is None or hash.hashType != 'sha256':
         return jsonify({"msg": "You need to provide a 'hashType' (Current support: sha256)."}), 400
     if is_hash_in_database(database, hash.word):
