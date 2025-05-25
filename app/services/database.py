@@ -70,3 +70,6 @@ class Database:
 
     def delete_one(self, filter: dict = {}):
         self.__active_collection.delete_one(filter)
+
+    def delete(self, filter: dict = {}):
+        self.__active_collection.delete_many(filter)

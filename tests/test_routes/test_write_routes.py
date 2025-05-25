@@ -60,4 +60,5 @@ def test_write(start):
     assert response.status_code == 400
     assert response.get_json() == {"errno": 1, "msg": "This hash is already in database."}
 
+    app.config['DATABASE'].set_active_collection('hashes')
     app.config['DATABASE'].delete_one({'word': '?F3$tjUo\"31P2JH$X(3O}.H&-HR0jq[3'})  # Delete hash to check next time

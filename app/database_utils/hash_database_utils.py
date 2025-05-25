@@ -95,4 +95,4 @@ def count_all_hashes(database: Database) -> int:
     """
 
     database.set_active_collection('hashes')
-    database.count()
+    return database.count()
