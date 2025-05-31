@@ -13,7 +13,7 @@
     <div id="header">
         <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
         <div id="menu">
-            <a href="{{ url_for('telegram.telegram_notification_write') }}"><button class="mainButton" id="telegramButton">Telegram Notification</button></a>
+            <a href="{{ url_for('telegram.telegram_notification_service') }}"><button class="mainButton" id="telegramButton">Telegram Notification</button></a>
             <a href="{{ url_for('view.view') }}"><button class="mainButton" id="viewButton">View</button></a>
             <a href="{{ url_for('write.write') }}"><button class="mainButton" id="writeButton">Write</button></a>
         </div>

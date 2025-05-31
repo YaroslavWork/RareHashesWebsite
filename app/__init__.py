@@ -12,7 +12,7 @@ from app.utils.notification import log
 def start_telegramAPI_loop(telegramAPI, password):
     while True:
         if not telegramAPI.is_open():
-            log("TelegramAPI", "Connect to server...")
+            log("RabbitMQ", "Connect to server...")
             asyncio.run(telegramAPI.open_connection(password))
         time.sleep(30)
 
@@ -35,6 +35,7 @@ def create_app():
     # --- Constants ---
     app.config['MIN_REPEATED_SIGNS'] = 25
     app.config['MAX_USER_LENGTH'] = 31
+    app.config['MAX_TELEGRAMID_LENGTH'] = 32
     app.config['MAX_WORD_LENGTH'] = 255
     app.config['ROW_IN_ONE_PAGE_LIMIT'] = 100  # For users (in view routes)
 

@@ -3,29 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rarest Hashes - Welcome Page</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Rarest Hashes - Write</title>
 </head>
 <body>
     <div id="header">
         <img id="mainImage" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo (made by YAr)">
         <div id="menu">
-            <a href="{{ url_for('telegram.telegram_notification_service') }}"><button class="mainButton" id="telegramButton">Telegram Notification</button></a>
             <a href="{{ url_for('main.default') }}"><button class="mainButton" id="welcomeButton">Welcome Page</button></a>
             <a href="{{ url_for('view.view') }}"><button class="mainButton" id="viewButton">View</button></a>
+            <a href="{{ url_for('write.write') }}"><button class="mainButton" id="writeButton">Write</button></a>
         </div>
     </div>
     <div class="content" id="writeContent">
-        <h3>Submit your proposition:</h3>
-        <input type="text" class="textInput" id="wordInput" placeholder="Enter a word...">
-        <select class="selectInput" id="hashTypeInput">
-            <option value="" disabled selected>Select a hash type...</option>
-            <option value="sha256">SHA256</option>
+        <h3>Telegram Notification Service:</h3>
+        <select class="selectInput" id="operationInput">
+            <option value="" disabled selected>Select an operation...</option>
+            <option value="add_user">Add User</option>
+            <option value="remove_user">Remove User</option>
         </select>
-        <input type="text" class="textInput" id="userInput" placeholder="Enter a user (optional)...">
+        <input type="text" class="textInput" id="telegramIdInput" placeholder="Enter a telegram ID..." style="display: none;">
+        <select class="selectInput" id="ruleInput" style="display: none;">
+            <option value="" disabled selected>Select a rule...</option>
+            <option value="by_rarity">Send notification by rarity</option>
+            <option value="by_ranking">Send notification by ranking</option>
+        </select>
+        <input type="text" class="textInput" id="minimumValueInput" placeholder="Provide a minimum value for your rule..." style="display: none;">
         <div id="buttonPanel">
             <button class="mainButton" id="submitWrite" onclick="sendData()">Submit</button>
             <p id="errorParagraph"></p>
@@ -33,6 +39,6 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='write.js') }}"></script>
+    <script src="{{ url_for('static', filename='telegram_notification_service.js') }}"></script>
 </body>
 </html>

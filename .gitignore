@@ -2,3 +2,4 @@
 app/static/images/*
 .env
 ssl/*
+hypercorn_run.sh

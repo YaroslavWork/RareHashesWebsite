@@ -37,7 +37,7 @@ class TelegramAPI:
             while True:
                 await asyncio.sleep(2)
         except:
-            log("TelegramAPI", "Connection failed")
+            log("TelegramAPI5", "Connection failed")
             return
 
     async def __handle_incoming(self, channel):
@@ -47,31 +47,31 @@ class TelegramAPI:
                 async with message.process():
                     message = message.body.decode()
                     self.__queue_income.append(message)
-                    #log("TelegramAPI", f"Receive: {message}")
+                    log("TelegramAPI1", f"Receive: {message}")
+                    log("TelegramAPI2", "something")
 
     async def __send_message(self, channel):
         while True:
             for message in self.__queue_outcome:
                 msg = aio_pika.Message(body=message.encode())
                 await channel.default_exchange.publish(msg, routing_key="website_to_telegram")
-                #log("TelegramAPI", f"Send: {message}")
+                log("TelegramAPI3", f"Send: {message}")
             self.__queue_outcome = []
             await asyncio.sleep(2)
 
     def is_open(self) -> bool:
         return self.__is_open
 
-    def check_queue(self, type: str):
-        # TYPE - |PING|, |ADD|, |NEW|
-        messages = []
-        idx = 0
-        while idx < len(self.__queue):
-            if self.__queue[idx].startswith(type):
-                messages.append(self.__queue[idx].split(type)[1].split('|NEXT|'))
-                del self.__queue[idx]
-            else:
-                idx += 1
-        return messages
+    async def wait_for_matching_message(self, expected_prefix: str, timeout: float = 5.0) -> list[str] | None:
+        timemark = time.time()
+        while time.time() - timemark < timeout:
+            for message in self.__queue_income[:]:  # iterate over a shallow copy
+                log("Telegram API (wait for matching message)", message)
+                if message.startswith(expected_prefix):
+                    self.__queue_income.remove(message)  # safe remove
+                    return message.split(expected_prefix)[1].split('|NEXT|')
+
+            await asyncio.sleep(0.1)
              
     def add_new_user(self, user_id:str, user_instruction: str='M25') -> None:
         self.__queue_outcome.append(f'|ADD|{user_id}|NEXT|{user_instruction}')
