@@ -54,7 +54,7 @@ function sendData() {
     }
 
     const operation_json = operation.value == "add_user" ? "add" : "remove"
-    const rule_json = operation.value == "by_rarity" ? "rarity" : "ranking"
+    const rule_json = rule.value === "by_rarity" ? "rarity" : "ranking"
 
     fetch('/telegram_notification_service', {
         method: 'POST',

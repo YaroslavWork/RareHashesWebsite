@@ -37,7 +37,7 @@ class TelegramAPI:
             while True:
                 await asyncio.sleep(2)
         except:
-            log("TelegramAPI5", "Connection failed")
+            log("TelegramAPI", "Connection failed")
             return
 
     async def __handle_incoming(self, channel):
@@ -47,15 +47,14 @@ class TelegramAPI:
                 async with message.process():
                     message = message.body.decode()
                     self.__queue_income.append(message)
-                    log("TelegramAPI1", f"Receive: {message}")
-                    log("TelegramAPI2", "something")
+                    log("TelegramAPI", f"Receive: {message}")
 
     async def __send_message(self, channel):
         while True:
             for message in self.__queue_outcome:
                 msg = aio_pika.Message(body=message.encode())
                 await channel.default_exchange.publish(msg, routing_key="website_to_telegram")
-                log("TelegramAPI3", f"Send: {message}")
+                log("TelegramAPI", f"Send: {message}")
             self.__queue_outcome = []
             await asyncio.sleep(2)
 
@@ -66,7 +65,6 @@ class TelegramAPI:
         timemark = time.time()
         while time.time() - timemark < timeout:
             for message in self.__queue_income[:]:  # iterate over a shallow copy
-                log("Telegram API (wait for matching message)", message)
                 if message.startswith(expected_prefix):
                     self.__queue_income.remove(message)  # safe remove
                     return message.split(expected_prefix)[1].split('|NEXT|')
