@@ -132,7 +132,6 @@ class TelegramAPI:
         timemark: float = time.time()
         while time.time() - timemark < timeout:
             for message in self.__queue_income[:]:  # iterate over a shallow copy
-                print(f"Checking message: {message}, UUID: {message_uuid}")  # Debugging line
                 is_that_message: bool = message.startswith(message_uuid)
                 if is_that_message:
                     self.__queue_income.remove(message)  # safe remove

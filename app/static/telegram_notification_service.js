@@ -31,42 +31,55 @@ function sendData() {
         telegramID.focus();
         errorParagraph.textContent = "Telegram ID must be a number.";
         return
-    } else if (rule.value === "") {
-        rule.style.borderColor = "red";
-        rule.focus();
-        errorParagraph.textContent = "Choose a rule.";
-        return
-    } else if (minimumValue.value.trim() === "") {
-        minimumValue.style.borderColor = "red";
-        minimumValue.focus();
-        errorParagraph.textContent = "Provide a number.";
-        return
-    } else if (isNaN(Number(minimumValue.value)) || !Number.isInteger(Number(minimumValue.value))) {
-        minimumValue.style.borderColor = "red";
-        minimumValue.focus();
-        errorParagraph.textContent = "Minimum value must be a number.";
-        return
-    } else if (Number(minimumValue.value < 0) || Number(minimumValue.value > 100000000)) {
-        minimumValue.style.borderColor = "red";
-        minimumValue.focus();
-        errorParagraph.textContent = "Minimum value must be in a range between 1 and 100 000 000.";
-        return
+    }
+    if (operation.value === "add_user") {
+        if (rule.value === "") {
+            rule.style.borderColor = "red";
+            rule.focus();
+            errorParagraph.textContent = "Choose a rule.";
+            return
+        } else if (minimumValue.value.trim() === "") {
+            minimumValue.style.borderColor = "red";
+            minimumValue.focus();
+            errorParagraph.textContent = "Provide a number.";
+            return
+        } else if (isNaN(Number(minimumValue.value)) || !Number.isInteger(Number(minimumValue.value))) {
+            minimumValue.style.borderColor = "red";
+            minimumValue.focus();
+            errorParagraph.textContent = "Minimum value must be a number.";
+            return
+        } else if (Number(minimumValue.value < 0) || Number(minimumValue.value > 100000000)) {
+            minimumValue.style.borderColor = "red";
+            minimumValue.focus();
+            errorParagraph.textContent = "Minimum value must be in a range between 1 and 100 000 000.";
+            return
+        }
     }
 
     const operation_json = operation.value == "add_user" ? "add" : "remove"
     const rule_json = rule.value === "by_rarity" ? "rarity" : "ranking"
+
+    let JSONData;
+    if (operation_json === 'add') {
+        JSONData = {
+            "telegram_operation": operation_json,
+            "telegram_id": telegramID.value,
+            "rule_type": rule_json,
+            "minimum_value": minimumValue.value,
+        };
+    } else {
+        JSONData = {
+            "telegram_operation": operation_json,
+            "telegram_id": telegramID.value,
+        };
+    }
 
     fetch('/telegram_notification_service', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-            "telegram_operation": operation_json,
-            "telegram_id": telegramID.value,
-            "rule_type": rule_json,
-            "minimum_value": minimumValue.value,
-        })
+        body: JSON.stringify(JSONData)
     })
     .then(response => response.json())
     .then(data => { 
@@ -74,10 +87,14 @@ function sendData() {
             errorParagraph.textContent = data.msg; // Display success message from server
             errorParagraph.style.color = "green"; // Change text color to green
             telegramID.style.borderColor = "green"; // Change border color to green
-        } else if (data.errno === 3) {
+        } else if (data.errno === 3 || data.errno === 7) {
             errorParagraph.textContent = data.msg; // Display error message from server
             telegramID.style.borderColor = "red";
             telegramID.focus();
+        } else if (data.errno === 4) {
+            errorParagraph.textContent = data.msg; // Display error message from server
+            errorParagraph.style.color = "green"; // Change text color to green
+            telegramID.style.borderColor = "green"; // Change border color to green
         } else {
             errorParagraph.textContent = data.msg; // Display error message from server
         }

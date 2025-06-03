@@ -54,6 +54,24 @@ def add_new_hash(telegramAPI: TelegramAPI, hash: Hash, top: int) -> str:
     return uuid
 
 
+def remove_user(telegramAPI: TelegramAPI, telegramID: str) -> str:
+    """
+    Removes a user from the TelegramAPI queue.
+
+    This function sends a request to the TelegramAPI to remove a user based on their Telegram ID.
+
+    Args:
+        telegramAPI (TelegramAPI): Instance of the TelegramAPI used to send user removal requests.
+        telegramID (str): The Telegram user ID to remove.
+
+    Returns:
+        str: A unique identifier (UUID) for the operation, which can be used to track the request.
+    """
+
+    uuid = telegramAPI.add_to_queue(f'|REM|{telegramID}')
+    return uuid
+
+
 async def wait_until_response(telegramAPI: TelegramAPI, message_uuid: str, max_time_in_seconds: int = 5) -> int:
     """
     Waits for a response from the Telegram queue within a specified timeout period.
