@@ -19,26 +19,35 @@
         </div>
     </div>
     <div class="content" id="mainContent">
-        <h3>About:</h3>
-        <p>Project <span id="logoText">"Rare Hashes"</span> was created to find rare repeated values ​​in hashes.</p>
-        <p>The rarity is to find a repeating pattern (0 or 1) at the beginning or end of the hash. The minimum hash that is accepted for saving in the database must have no less than 25 repeating characters.</p>
-        <p>You can save this hash using a word that turns into this hash. On the server side, it is checked whether the hash is really rare and if successful, it is saved to the database along with the (optional) nickname</p>
-        <h3>Methods to write your hash:</h3>
-        <p>The first method is to click on the button below. You will be taken to a form that you need to fill out to enter the rare hash into the database.</p>
-        <button class="mainButton">Write</button>
-        <p>The second method is to download a bot from my github to automatically find and send hashes</p>
-        <button class="mainButton">Go to github</button>
-        <p>Last method is to put POST method with properiate json content to <code>.../write</code>.</p>
-        <p>Example json content:</p>
-        <code><pre>{
+        <h3>Welcome to <span id="logoText">Rare Hashes</span></h3>
+        <p style="font-size:1.25rem; margin-bottom:1.5em;">Find and share the rarest hash patterns. Discover, contribute, and explore unique hash values with our community-driven platform.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:2em; justify-content:center; margin-bottom:2em;">
+            <div style="flex:1; min-width:220px; max-width:340px; background:#f8fafc; border-radius:18px; box-shadow:0 2px 12px rgba(60,60,120,0.07); padding:1.5em;">
+                <h4 style="color:#3b82f6; margin-top:0;">What is a Rare Hash?</h4>
+                <p>A rare hash is a hash with a repeating pattern (0 or 1) at the beginning or end. Only hashes with at least 25 repeating characters are accepted.</p>
+            </div>
+            <div style="flex:1; min-width:220px; max-width:340px; background:#f8fafc; border-radius:18px; box-shadow:0 2px 12px rgba(60,60,120,0.07); padding:1.5em;">
+                <h4 style="color:#3b82f6; margin-top:0;">How to Contribute?</h4>
+                <ol style="padding-left:1.2em;">
+                    <li>Click <b>Write</b> to submit your hash.</li>
+                    <li>Use our <b>Telegram Bot</b> for automation.</li>
+                    <li>Send a POST request to <code>/write</code> with your hash data.</li>
+                </ol>
+            </div>
+        </div>
+        <div style="margin-bottom:2em;">
+            <a href="{{ url_for('write.write') }}" class="mainButton">Submit a Hash</a>
+            <a href="https://github.com/YaroslavWork" class="mainButton" target="_blank">GitHub</a>
+        </div>
+        <div style="background:#f1f5f9; border-radius:14px; padding:1em 1.5em; margin-bottom:1.5em;">
+            <h4 style="color:#6366f1; margin-top:0;">Example JSON for API</h4>
+            <pre style="background:#e0e7ff; border-radius:8px; padding:1em; font-size:1em;">{
     "word": "pRkKpnrndc1^z!T:6@Q=\"y9j0a#p=S=;",
     "hashType": "sha256",
     "user": "YAr"
-}</pre></code>
-        <h3>Headers:</h3>
-        <p>This project was created by YAr (github: YaroslavWork) for educational purposes.</p>
-        <button onclick="location.href='https://github.com/YaroslavWork'" class="mainButton">Github</button>
-        <p>Good luck finding the rarest hash.</p>
+}</pre>
+        </div>
+        <p style="margin-top:2em; color:#888;">Created by <b>YAr</b> (<a href="https://github.com/YaroslavWork" style="color:#3b82f6; text-decoration:underline;">YaroslavWork</a>) for educational purposes.</p>
     </div>
 </body>
 </html>

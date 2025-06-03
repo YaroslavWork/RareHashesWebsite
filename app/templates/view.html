@@ -19,40 +19,16 @@
         </div>
     </div>
     <div class="content" id="viewContent">
-        <h3>List (Results {{ count }}): </h3>
+        <h3>Rare Hashes List <span style="color:#6366f1; font-size:1.1em;">({{ count }})</span></h3>
         <table id="viewTable">
             <tr>
                 <th>#</th>
-                <th><div class="thContainer">
-                    Word
-                    <div class="thButtonsContainer">
-                        <button class="smallFilterButton">&uarr;</button>
-                        <button class="smallFilterButton">&darr;</button>
-                    </div>
-                </div></th>
-                <th><div class="thContainer">
-                    Start From Beggining
-                    <div class="thButtonsContainer">
-                        <button class="smallFilterButton">&uarr;</button>
-                        <button class="smallFilterButton">&darr;</button>
-                    </div>
-                </div></th>
+                <th><div class="thContainer">Word<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
+                <th><div class="thContainer">Start From Beginning<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
                 <th>Hash Type</th>
-                <th><div class="thContainer">
-                    Counts
-                    <div class="thButtonsContainer">
-                        <button class="smallFilterButton">&uarr;</button>
-                        <button class="smallFilterButton">&darr;</button>
-                    </div>
-                </div></th>
+                <th><div class="thContainer">Counts<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
                 <th>User</th>
-                <th><div class="thContainer">
-                    Created At
-                    <div class="thButtonsContainer">
-                        <button class="smallFilterButton">&uarr;</button>
-                        <button class="smallFilterButton">&darr;</button>
-                    </div>
-                </div></th>
+                <th><div class="thContainer">Created At<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
             </tr>
             {% for item in result %}
             <tr>
@@ -67,7 +43,6 @@
             {% endfor %}
         </table>
     </div>
-
     <input type="hidden" id="startCountValue" value="{{ start_count }}">
     <script src="{{ url_for('static', filename='hashes.js') }}"></script>
 </body>
