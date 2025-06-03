@@ -45,8 +45,8 @@ async def telegram_notification_service():
         return jsonify({"msg": "'minimum_value' must be in a range between 1 and 100 000 000."}), 400
     
     if telegram_operation == 'add':
-        add_new_user(telegramAPI, telegramID, rule_type, minimum_value)
-        value = await wait_until_response(telegramAPI, telegram_operation, max_time_in_seconds=5)
+        message_uuid: str = add_new_user(telegramAPI, telegramID, rule_type, minimum_value)
+        value = await wait_until_response(telegramAPI, message_uuid, max_time_in_seconds=5)
         if value == 0:
             return jsonify({
                 "errno": 0,

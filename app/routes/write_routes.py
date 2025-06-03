@@ -4,6 +4,7 @@ import asyncio
 
 from app.utils.hash_utils import get_sha256_hash, convert_hex_to_binary, count_repeated_pattern_from_start
 from app.database_utils.hash_database_utils import add_hash_to_database, how_many_hashes_above, is_hash_in_database
+from app.telegram_utils.notification_service_utils import add_new_hash
 from app.models.hash import Hash
 
 write_bp = Blueprint("write", __name__)
@@ -69,8 +70,9 @@ def write():
     top: int = how_many_hashes_above(database=database, border=hash.counts) + 1
 
     # Send to a telegram bot
-    telegramAPI.notify(hash, top)
+    add_new_hash(telegramAPI=telegramAPI, hash=hash, top=top)
 
+    # Add to database
     try:
         add_hash_to_database(database=database, hash=hash)
         return jsonify({
