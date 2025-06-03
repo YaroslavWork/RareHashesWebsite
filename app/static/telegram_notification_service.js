@@ -16,7 +16,12 @@ function sendData() {
     errorParagraph.textContent = ""; // Clear previous error message
 
     // Pre-send validation
-    if (telegramID.value.trim() === "") {
+    if (operation.value === "") {
+        operation.style.borderColor = "red";
+        operation.focus();
+        errorParagraph.textContent = "Choose an operation.";
+        return
+    } else if (telegramID.value.trim() === "") {
         telegramID.style.borderColor = "red";
         telegramID.focus();
         errorParagraph.textContent = "Provide a number.";
@@ -56,11 +61,18 @@ function sendData() {
         }
     }
 
-    const operation_json = operation.value == "add_user" ? "add" : "remove"
+    let operation_json
+    if (operation.value === "add_user") {
+        operation_json = "add";
+    } else if (operation.value === "remove_user") {
+        operation_json = "remove";
+    } else if (operation.value === "change_rule") {
+        operation_json = "change";
+    }
     const rule_json = rule.value === "by_rarity" ? "rarity" : "ranking"
 
     let JSONData;
-    if (operation_json === 'add') {
+    if (operation_json === 'add' || operation_json === 'change') {
         JSONData = {
             "telegram_operation": operation_json,
             "telegram_id": telegramID.value,
@@ -83,18 +95,19 @@ function sendData() {
     })
     .then(response => response.json())
     .then(data => { 
-        if (data.errno === 0) { // No error
+        if (data.errno === 0 || data.errno === 4 || data.errno === 8) { // No error
             errorParagraph.textContent = data.msg; // Display success message from server
             errorParagraph.style.color = "green"; // Change text color to green
             telegramID.style.borderColor = "green"; // Change border color to green
-        } else if (data.errno === 3 || data.errno === 7) {
+        } else if (data.errno === 3 || data.errno === 7 || data.errno === 11) {
             errorParagraph.textContent = data.msg; // Display error message from server
             telegramID.style.borderColor = "red";
             telegramID.focus();
-        } else if (data.errno === 4) {
+        } else if (data.errno === 12) {
             errorParagraph.textContent = data.msg; // Display error message from server
-            errorParagraph.style.color = "green"; // Change text color to green
-            telegramID.style.borderColor = "green"; // Change border color to green
+            rule.style.borderColor = "red";
+            minimumValue.style.borderColor = "red";
+            minimumValue.focus();
         } else {
             errorParagraph.textContent = data.msg; // Display error message from server
         }
@@ -116,7 +129,7 @@ function clearInputs() {
 }
 
 operation.addEventListener("change", function () {
-    if (operation.value == "add_user") {
+    if (operation.value == "add_user" || operation.value == "change_rule") {
         telegramID.style.display = "inline";
         rule.style.display = "inline";
         minimumValue.style.display = "inline";
@@ -130,3 +143,7 @@ operation.addEventListener("change", function () {
         minimumValue.style.display = "none";
     }
   });
+
+document.addEventListener("DOMContentLoaded", function () {
+    clearInputs(); // Clear inputs on page load
+});

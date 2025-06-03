@@ -2,7 +2,7 @@ import threading
 import queue
 from flask import Blueprint, jsonify, render_template, request, current_app
 
-from app.telegram_utils.notification_service_utils import add_new_user, remove_user, wait_until_response
+from app.telegram_utils.notification_service_utils import add_new_user, remove_user, change_rule, wait_until_response
 
 telegram_bp = Blueprint("telegram", __name__)
 
@@ -19,7 +19,6 @@ async def telegram_notification_service():
         telegramAPI = current_app.config['TELEGRAMAPI']
 
         data = request.get_json()
-        print(request.method, request.get_json())
 
         telegram_operation = data.get("telegram_operation", None)
         telegramID = data.get("telegram_id", None)
@@ -29,8 +28,8 @@ async def telegram_notification_service():
         # Validation
         if telegram_operation is None:
             return jsonify({"msg": "You need to provide a 'telegram_operation'."}), 400
-        if telegram_operation not in ['add', 'remove']:
-            return jsonify({"msg": "'telegram_operation' only support 'add' and 'remove' command."}), 400
+        if telegram_operation not in ['add', 'remove', 'change']:
+            return jsonify({"msg": "'telegram_operation' only support 'add', 'remove' and 'change' command."}), 400
         if telegramID is None:
             return jsonify({"msg": "You need to provide a 'telegram_id'."}), 400
         if not telegramID.isdigit():
@@ -38,7 +37,7 @@ async def telegram_notification_service():
         if len(telegramID) > max_telegramID_length:
             return jsonify({"msg": f"You reach the max length of the user. Max length is {max_telegramID_length} (Your: {len(telegramID)})."}), 400
     
-        if telegram_operation == 'add':
+        if telegram_operation == 'add' or telegram_operation == 'change':
             if rule_type is None:
                 return jsonify({"msg": "You need to provide a 'rule_type'."}), 400
             if rule_type not in ['rarity', 'ranking']:
@@ -47,7 +46,8 @@ async def telegram_notification_service():
                 return jsonify({"msg": "'minimum_value' must be a number."}), 400
             if not (0 < int(minimum_value) <= 100_000_000):
                 return jsonify({"msg": "'minimum_value' must be in a range between 1 and 100 000 000."}), 400
-    
+
+        if telegram_operation == 'add':
             message_uuid: str = add_new_user(telegramAPI, telegramID, rule_type, minimum_value)
             value = await wait_until_response(telegramAPI, message_uuid, max_time_in_seconds=5)
             if value == 0:
@@ -98,3 +98,36 @@ async def telegram_notification_service():
                     "errno": 7,
                     "msg": "This user is not in notification service."
                 }), 400
+            
+        elif telegram_operation == 'change':
+            message_uuid: str = change_rule(telegramAPI, telegramID, rule_type, minimum_value)
+            value = await wait_until_response(telegramAPI, message_uuid, max_time_in_seconds=5)
+            if value == 0:
+                return jsonify({
+                    "errno": 8,
+                    "msg": "Telegram user rule is successfully changed."
+                }), 200
+            elif value == 1 or value == 2:
+                return jsonify({
+                    "errno": 9,
+                    "msg": "Something went wrong. Try again later."
+                }), 400
+            elif value == -1:
+                return jsonify({
+                    "errno": 10,
+                    "msg": "Telegram bot is currently unavailable. Try again later."
+                }), 503
+            elif value == 3:
+                return jsonify({
+                    "errno": 11,
+                    "msg": "This user is not in notification service."
+                }), 400
+            elif value == 4:
+                return jsonify({
+                    "errno": 12,
+                    "msg": "This user is already in notification service with this rule."
+                }), 400
+            else:
+                return jsonify({
+                    "msg": "Not Implemented..."
+                }), 501

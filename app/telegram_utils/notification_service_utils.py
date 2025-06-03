@@ -72,6 +72,31 @@ def remove_user(telegramAPI: TelegramAPI, telegramID: str) -> str:
     return uuid
 
 
+def change_rule(telegramAPI: TelegramAPI, telegramID: str, rule: str, minimum_value: str) -> str:
+    """
+    Changes the rule for a user in the TelegramAPI queue.
+
+    This function updates the user's rule based on the provided parameters and sends it to the TelegramAPI.
+
+    Args:
+        telegramAPI (TelegramAPI): Instance of the TelegramAPI used to send user rule changes.
+        telegramID (str): The Telegram user ID whose rule is to be changed.
+        rule (str): The new rule type for filtering or evaluating values. Accepted values: 'rarity', 'ranking'.
+        minimum_value (str): The new threshold value for the rule.
+
+    Returns:
+        str: A unique identifier (UUID) for the operation, which can be used to track the request.
+    """
+
+    uuid = ''
+    if rule == 'rarity':
+        uuid = telegramAPI.add_to_queue(f'|CHN|{telegramID}|NEXT|M{minimum_value}')
+    elif rule == 'ranking':
+        uuid = telegramAPI.add_to_queue(f'|CHN|{telegramID}|NEXT|T{minimum_value}')
+    
+    return uuid
+
+
 async def wait_until_response(telegramAPI: TelegramAPI, message_uuid: str, max_time_in_seconds: int = 5) -> int:
     """
     Waits for a response from the Telegram queue within a specified timeout period.
