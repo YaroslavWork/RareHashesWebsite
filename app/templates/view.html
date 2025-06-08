@@ -20,30 +20,50 @@
     </div>
     <div class="content" id="viewContent">
         <h3>Rare Hashes List <span style="color:#6366f1; font-size:1.1em;">({{ count }})</span></h3>
-        <table id="viewTable">
-            <tr>
-                <th>#</th>
-                <th><div class="thContainer">Word<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
-                <th><div class="thContainer">Start From Beginning<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
-                <th>Hash Type</th>
-                <th><div class="thContainer">Counts<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
-                <th>User</th>
-                <th><div class="thContainer">Created At<div class="thButtonsContainer"><button class="smallFilterButton">&uarr;</button><button class="smallFilterButton">&darr;</button></div></div></th>
-            </tr>
+        <div id="viewListHeader" class="view-list-header">
+            <span class="header-col">#</span>
+            <span class="header-col">Word</span>
+            <span class="header-col sortable-header">
+                Start From Beginning
+                <span class="thButtonsContainer">
+                    <button class="smallFilterButton" data-sort="isFromBeginning" data-dir="1">&#8593;</button>
+                    <button class="smallFilterButton" data-sort="isFromBeginning" data-dir="-1">&#8595;</button>
+                </span>
+            </span>
+            <span class="header-col">Hash Type</span>
+            <span class="header-col sortable-header">
+                Counts
+                <span class="thButtonsContainer">
+                    <button class="smallFilterButton" data-sort="counts" data-dir="1">&#8593;</button>
+                    <button class="smallFilterButton" data-sort="counts" data-dir="-1">&#8595;</button>
+                </span>
+            </span>
+            <span class="header-col">User</span>
+            <span class="header-col sortable-header">
+                Created At
+                <span class="thButtonsContainer">
+                    <button class="smallFilterButton" data-sort="createdAt" data-dir="1">&#8593;</button>
+                    <button class="smallFilterButton" data-sort="createdAt" data-dir="-1">&#8595;</button>
+                </span>
+            </span>
+        </div>
+        <div id="viewList">
+            {% set number = start_count %}
             {% for item in result %}
-            <tr>
-                <td>[Number]</td>
-                <td>{{ item.word }}</td>
-                <td>{{ item.isFromBeginning }}</td>
-                <td>{{ item.hashType }}</td>
-                <td>{{ item.counts }}</td>
-                <td>{{ item.user }}</td>
-                <td>{{ item.createdAt }}</td>
-            </tr>
+            <div class="view-list-row">
+                <span class="row-col">{{ number + loop.index0 }}</span>
+                <span class="row-col">{{ item.word }}</span>
+                <span class="row-col">{{ item.isFromBeginning }}</span>
+                <span class="row-col">{{ item.hashType }}</span>
+                <span class="row-col">{{ item.counts }}</span>
+                <span class="row-col">{{ item.user }}</span>
+                <span class="row-col">{{ item.createdAt }}</span>
+            </div>
             {% endfor %}
-        </table>
+        </div>
     </div>
     <input type="hidden" id="startCountValue" value="{{ start_count }}">
+    <script src="{{ url_for('static', filename='view.js') }}"></script>
     <script src="{{ url_for('static', filename='hashes.js') }}"></script>
 </body>
 </html>
