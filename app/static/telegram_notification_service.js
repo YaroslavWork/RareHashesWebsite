@@ -2,8 +2,11 @@ const operation = document.getElementById("operationInput");
 const telegramID = document.getElementById("telegramIdInput");
 const rule = document.getElementById("ruleInput");
 const minimumValue = document.getElementById("minimumValueInput");
+const verification = document.getElementById("verificationInput");
 
 const errorParagraph = document.getElementById("errorParagraph");
+const errorParagraphVerification = document.getElementById("errorParagraphVerification");
+const verificationButton = document.getElementById("submitVerification");
 
 function sendData() {
     // Clear previous styles and error messages
@@ -108,10 +111,64 @@ function sendData() {
             rule.style.borderColor = "red";
             minimumValue.style.borderColor = "red";
             minimumValue.focus();
+        } else if (data.errno === 13) {
+            errorParagraph.textContent = data.msg; // Display error message from server
+            verification.style.display = "inline";
+            verification.style.borderColor = "red";
+            // Block field above verification (greyed out)
+            telegramID.disabled = true;
+            rule.disabled = true;
+            minimumValue.disabled = true;
+            verification.value = ""; // Clear the verification input
+
+            verification.focus();
         } else {
             errorParagraph.textContent = data.msg; // Display error message from server
         }
     })
+}
+
+function sendVerification() {
+    // Pre-send validation
+    if (verification.value.trim() === "") {
+        verification.style.borderColor = "red";
+        verification.focus();
+        errorParagraphVerification.textContent = "Provide a number.";
+        return
+    } else if (isNaN(Number(verification.value)) || !Number.isInteger(Number(verification.value))) {
+        verification.style.borderColor = "red";
+        verification.focus();
+        errorParagraphVerification.textContent = "Verification code must be a number.";
+        return
+    } else if (verification.value.length !== 6) {
+        verification.style.borderColor = "red";
+        verification.focus();
+        errorParagraphVerification.textContent = "Verification code must be 6 digits long.";
+        return
+    }
+
+    fetch('/telegram_notification_service/verify', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+            body: JSON.stringify({
+                "telegram_id": telegramID.value,
+                "verification_code": verification.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.errno === 0) { // No error
+                errorParagraphVerification.textContent = data.msg; // Display success message from server
+                errorParagraphVerification.style.color = "green"; // Change text color to green
+                verification.style.borderColor = "green"; // Change border color to green
+            } else {
+                errorParagraphVerification.textContent = data.msg; // Display error message from server
+                verification.style.borderColor = "red";
+                verification.focus();
+            }
+        });
 }
 
 function clearInputs() {
@@ -119,13 +176,18 @@ function clearInputs() {
     telegramID.value = "";
     rule.value = "";
     minimumValue.value = "";
+    verification.value = "";
     errorParagraph.textContent = ""
     errorParagraph.style.color = "#ff0000"; // Reset to default color
     telegramID.style.borderColor = "#4275c5"; // Reset border color
+    operation.style.borderColor = "#4275c5"; // Reset border color
+    rule.style.borderColor = "#4275c5"; // Reset border color
     minimumValue.style.borderColor = "#4275c5"; // Reset border color
     telegramID.style.display = "none";
     rule.style.display = "none";
     minimumValue.style.display = "none";
+    verification.style.display = "none";
+
 }
 
 operation.addEventListener("change", function () {

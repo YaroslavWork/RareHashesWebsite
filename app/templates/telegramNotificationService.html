@@ -38,6 +38,11 @@
             <p id="errorParagraph"></p>
             <button class="mainButton" id="clearProposition" onclick="clearInputs()">Clear</button>
         </div>
+        <input type="text" class="textInput" id="verificationInput" placeholder="Enter a verification code (6 numbers)..." style="display: none;">
+        <div id="buttonPanel">
+            <button class="mainButton" id="submitVerification" onclick="sendVerification()">Submit</button>
+            <p id="errorParagraphVerification"></p>
+        </div>
     </div>
     <script src="{{ url_for('static', filename='telegram_notification_service.js') }}"></script>
 </body>

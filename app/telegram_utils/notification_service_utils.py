@@ -97,6 +97,25 @@ def change_rule(telegramAPI: TelegramAPI, telegramID: str, rule: str, minimum_va
     return uuid
 
 
+def send_verification_code(telegramAPI: TelegramAPI, telegramID: str, code: str) -> str:
+    """
+    Sends a verification code to a user via the TelegramAPI.
+
+    This function formats the verification code and sends it to the TelegramAPI for delivery to the specified user.
+
+    Args:
+        telegramAPI (TelegramAPI): Instance of the TelegramAPI used to send verification codes.
+        telegramID (str): The Telegram user ID to send the verification code to.
+        code (str): The verification code to be sent.
+
+    Returns:
+        str: A unique identifier (UUID) for the operation, which can be used to track the request.
+    """
+
+    uuid = telegramAPI.add_to_queue(f'|VER|{telegramID}|NEXT|{code}')
+    return uuid
+
+
 async def wait_until_response(telegramAPI: TelegramAPI, message_uuid: str, max_time_in_seconds: int = 5) -> int:
     """
     Waits for a response from the Telegram queue within a specified timeout period.
@@ -109,7 +128,7 @@ async def wait_until_response(telegramAPI: TelegramAPI, message_uuid: str, max_t
         max_time_in_seconds (int, optional): Maximum time in seconds to wait for a response. Defaults to 5.
 
     Returns:
-        str: The error number in case of some errors 0 if everything good, time up return -1.
+        str: The error number in case of some errors 0 if everything good, time up return -1, verification return -2.
     """
 
     if not telegramAPI.is_open():
@@ -123,5 +142,7 @@ async def wait_until_response(telegramAPI: TelegramAPI, message_uuid: str, max_t
         return 0
     elif messages[0] == 'errno':
         return int(messages[1])
+    elif messages[0] == 'ver':
+        return -2
 
     return -1
