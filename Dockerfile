@@ -1,5 +1,9 @@
 FROM python:3.10.9
 
+ENV HOST=0.0.0.0:6798 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 WORKDIR /rare-hashes-website
 
 COPY requirements.txt .
@@ -11,4 +15,9 @@ COPY ./app ./app
 COPY .env .
 COPY ./ssl ./ssl
 
-CMD ["python", "./main.py"]
+EXPOSE 6798
+
+CMD ["hypercorn", "main:app", \
+        "--bind", "0.0.0.0:6798", \
+        "--certfile", "./ssl/rareHashes.crt", \
+        "--keyfile", "./ssl/rareHashes.key"]
