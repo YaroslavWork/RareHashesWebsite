@@ -6,23 +6,21 @@ This project showcases the rarest hashes — SHA-256 hashes that start with at l
 
 Users can submit their own hashes, which are then converted to SHA-256 (with plans to add more hashing methods in the future). When a rare hash meeting the criteria is found, it is saved to the database along with the user’s name for recognition.
 
-The project is part of a system consisting (microservices) of three components:
+The project is part of a system consisting of three microservice components:
 
 - A web interface displaying the rarest hashes found.
-
-- A [telegram bot](https://github.com/YaroslavWork/RareHashesTelegramBot) that notifies users about new rare hashes.
-
+- A [Telegram bot](https://github.com/YaroslavWork/RareHashesTelegramBot) that notifies users about new rare hashes.
 - An [automated searching bot](https://github.com/YaroslavWork/RareHashFinder) that scans and uploads rare hashes to the database.
 
-This combination highlights advanced backend processing , database management, and real-time user notification integration.
+This combination highlights advanced backend processing, database management, and real-time user notification integration.
 
 *"Do one thing, and do it well."*
 
 ---
 
-### Installation (for linux)
+### Installation (for Linux)
 
-1. Install MongoDB (On Ubuntu):
+1. Install MongoDB (on Ubuntu):
 
     [Follow installation process.](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/)
 
@@ -34,9 +32,9 @@ This combination highlights advanced backend processing , database management, a
     sudo systemctl enable mongod
     ```
 
-3. Make admin access:
+3. Create admin access:
 
-    Connect to mongo shell:
+    Connect to the mongo shell:
     ```
     mongosh
     ```
@@ -68,7 +66,7 @@ This combination highlights advanced backend processing , database management, a
     sudo systemctl restart mongod
     ```
 
-4. Make user access for database:
+4. Create user access for the database:
 
     Inside the Mongo shell connected as admin:
     ```
@@ -79,64 +77,84 @@ This combination highlights advanced backend processing , database management, a
         pwd: "veryStrongPassword",
         roles: [ { role: "readWrite", db: "hashDatabase" } ]
     })
+    ```
 
 5. Launch Telegram Bot (Optional):
 
     [See installation process.](https://github.com/YaroslavWork/RareHashesTelegramBot)
 
-6. Create **.env** file:
+6. Create a **.env** file:
 
     This file contains all necessary private information. Your **.env** must contain:
 
     ```
     DATABASE_IP_AND_PORT=127.0.0.1:25000
-    TELEGRAM_BOT_IP_AND_PORT=127.0.0.1:33000
     DATABASE_LOGIN=database_login
     DATABASE_PASSWORD=veryStrongPassword
     HOST=127.0.0.1:5000
+    RABBIT_LOGIN=webServer
+    RABBIT_PASSWORD=insanelyStrongPassword
+    RABBIT_HOST=127.0.0.1:5672
     DEBUG=False
-    PEM_PASS=veryStrongPassword
     ```
 
     This configuration file contains:
-    - ```DATABASE_IP_AND_PORT``` - connection to mongoDB database. This database must have collection 'hashes';
-    - ```TELEGRAM_BOT_IP_AND_PORT``` - my other project to connects telegram bot and send notifications in case if users need;
-    - ```DATABASE_LOGIN``` - login to mongoDB;
-    - ```DATABASE_PASSWORD``` - password to mongoDB;
-    - ```HOST``` - site domain;
-    - ```DEBUG``` - debugging for developers;
-    - ```PEM_PASS``` - https conection password.
+    - `DATABASE_IP_AND_PORT` - connection to the MongoDB database. This database must have a collection 'hashes';
+    - `DATABASE_LOGIN` - login for MongoDB;
+    - `DATABASE_PASSWORD` - password for MongoDB;
+    - `HOST` - site domain;
+    - `RABBIT_LOGIN` - login for RabbitMQ communicator (see below);
+    - `RABBIT_PASSWORD` - password for RabbitMQ communicator (see below);
+    - `RABBIT_HOST` - connection to RabbitMQ communicator (see below);
+    - `DEBUG` - debugging for developers;
 
-7. Create an ssl sertificates:
+7. Create SSL certificates:
 
-    Create an **rareHashes.crt** and **rareHashes.key** with for ex. `openssl` and put in **./ssl** directory.
+    Create **rareHashes.crt** and **rareHashes.key** with, for example, `openssl` and put them in the **./ssl** directory.
 
 ---
 
 ### Usage
 
-1. Install docker (In Arch):
+1. Install Docker (on Arch):
     ```
     pacman -S docker
     ```
 
-2. Run docker:
+2. Run Docker:
 
     ```
     sudo systemctl start docker
     ```
 
-    To run docker everytime when you launch:
+    To run Docker every time you launch:
     ```
     sudo systemctl enable docker
     ```
 
-3. Create an image:
+3. Launch a RabbitMQ container:
+    ```
+    docker run -d --hostname my-rabbit --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+    ```
+
+4. Add users to enable communication between servers:
+
+    - Go to the **Admin** section.
+    - Add an admin. Username: `admin`; Password: `****`; Tags: `Admin`.
+    - Add a management user for the web server. Username: `webServer`; Password: `****`; Tags: `Management`.
+    - Add a management user for the Telegram bot. Username: `telegramBot`; Password: `****`; Tags: `Management`.
+    - Click on the admin name in the table.
+    - Click `Set Permission`. Make sure **Virtual Host** is set to `/`.
+    - Repeat this for the other management users.
+    - Delete the guest user and refresh RabbitMQ.
+    - Log in as an admin and you will see the configuration panel.
+
+5. Create an image:
     ```sh
     docker build -t web-server .
     ```
 
-4. Create and run a container:
+6. Create and run a container:
     ```sh
     docker run -d --name web-server-cont -p 6798:6798 web-server
     ```
@@ -147,21 +165,23 @@ This combination highlights advanced backend processing , database management, a
 
 This project follows an MVC-inspired architecture. The entry point is **main.py**, and the core logic is organized within the **app** directory:
 
-- **app/services/\*** - Core services responsible for communication with other microservices;
-- **app/routes/\*** - Logic handling HTTP routes and request processing;
-- **app/static/\*** and **./app/templates/\*** - Frontend assets and HTML templates;
-- **app/utils/\*** -  Utility functions used across the project;
-- **app/database_utils/\*** - Helper functions for communicating with the database;
-- **app/models/\*** - Static classes used to organize and structure data for convenience;
+- **app/services/*** - Core services responsible for communication with other microservices;
+- **app/routes/*** - Logic handling HTTP routes and request processing;
+- **app/static/*** and **./app/templates/*** - Frontend assets and HTML templates;
+- **app/utils/*** - Utility functions used across the project;
+- **app/telegram_utils/*** - Helper functions to communicate with the Telegram service;
+- **app/database_utils/*** - Helper functions to communicate with the database;
+- **app/models/*** - Static classes used to organize and structure data for convenience;
 - **app/__init__.py** - Initializes the Flask app and registers Blueprints for modular organization;
-- **Dockerfile** and **requirements.txt** - Used to build and run the application in Docker containers.
+- **Dockerfile** and **requirements.txt** - Used to build and run the application in Docker containers;
+- **tests/*** - Unit tests for this project.
 
 ---
 
-### Dependency
+### Dependencies
 
-- Python 3.13+;
-- All python modules are in **requirements.txt**.
+- Python 3.10.9 (later versions have a problem with hashlib dependencies)
+- All Python modules are listed in **requirements.txt**.
 
 ---
 
@@ -173,10 +193,12 @@ Interested in improving the frontend? Contributions are very welcome! Feel free 
 
 ### License
 
-MIT License - see `LICENSE` file for details.
+MIT License - see the `LICENSE` file for details.
 
 ---
 
 ### Demo
 
-If my server isn’t being used for something else, the project should be running [here](https://158.220.119.11:6798/).
+If my server isn’t being used for something else, the project should be running [here](https://158.220.119.11:6798/). I created my own certificate for this project. Web browsers will warn you about this, and you will need to confirm to proceed to the page.
+
+**[Rare Hashes Web Server - Demo](https://158.220.119.11:6798/)**

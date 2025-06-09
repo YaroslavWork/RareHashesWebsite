@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.12.5] - 2025-06-09
+- Update README.md
+
 ## [v2.12.4] - 2025-06-09
 - Add description how to find a telegram ID in telegram notification route
 
