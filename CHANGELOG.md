@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.12.6] - 2025-06-11
+- Update instruction in telegram notification
+
 ## [v2.12.5] - 2025-06-09
 - Update README.md
 
