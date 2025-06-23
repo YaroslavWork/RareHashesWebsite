@@ -70,6 +70,11 @@ async def telegram_notification_service():
                     "errno": 3,
                     "msg": "This user is already in notification service."
                 }), 400
+            elif value == -2:
+                return jsonify({
+                    "errno": 13,
+                    "msg": "Telegram bot sent you verification code. Provide in the field below."
+                }), 400
             else:
                 return jsonify({
                     "msg": "Not Implemented..."
@@ -93,6 +98,11 @@ async def telegram_notification_service():
                     "errno": 6,
                     "msg": "Telegram bot is currently unavailable. Try again later."
                 }), 503
+            elif value == -2:
+                return jsonify({
+                    "errno": 13,
+                    "msg": "Telegram bot sent you verification code. Provide in the field below."
+                }), 400
             elif value == 2:
                 return jsonify({
                     "errno": 7,
@@ -117,6 +127,11 @@ async def telegram_notification_service():
                     "errno": 10,
                     "msg": "Telegram bot is currently unavailable. Try again later."
                 }), 503
+            elif value == -2:
+                return jsonify({
+                    "errno": 13,
+                    "msg": "Telegram bot sent you verification code. Provide in the field below."
+                }), 400
             elif value == 3:
                 return jsonify({
                     "errno": 11,
@@ -131,3 +146,54 @@ async def telegram_notification_service():
                 return jsonify({
                     "msg": "Not Implemented..."
                 }), 501
+            
+
+@telegram_bp.route('/telegram_notification_service/verify', methods=['POST'])
+def verification_code():
+    """Telegram route [/telegram_notification_service/verify]: Verify user with telegram bot"""
+
+    if request.method == 'POST':
+        telegramAPI = current_app.config['TELEGRAMAPI']
+        max_telegramID_length = current_app.config['MAX_TELEGRAMID_LENGTH']
+
+        data = request.get_json()
+    
+        telegramID = data.get("telegram_id", None)
+        verification_code = data.get("verification_code", None)
+
+        if telegramID is None:
+            return jsonify({"msg": "You need to provide a 'telegram_id'."}), 400
+        if not telegramID.isdigit():
+            return jsonify({"msg": "'telegram_id' must be a number."}), 400
+        if len(telegramID) > max_telegramID_length:
+            return jsonify({"msg": f"You reach the max length of the user. Max length is {max_telegramID_length} (Your: {len(telegramID)})."}), 400
+        if verification_code is None:
+            return jsonify({"msg": "You need to provide a 'verification_code'."}), 400
+
+        message_uuid: str = telegramAPI.add_to_queue(f'|VER|{telegramID}|NEXT|{verification_code}')
+        value = wait_until_response(telegramAPI, message_uuid, max_time_in_seconds=5)
+        
+        if value == 0:
+            return jsonify({
+                "errno": 0,
+                "msg": "Verification code is correct."
+            }), 200
+        elif value == 1:
+            return jsonify({
+                "errno": 1,
+                "msg": "Something went wrong. Try again later."
+            }), 400
+        elif value == 2:
+            return jsonify({
+                "errno": 1,
+                "msg": "Verification code is incorrect."
+            }), 400
+        elif value == -1:
+            return jsonify({
+                "errno": 2,
+                "msg": "Telegram bot is currently unavailable. Try again later."
+            }), 503
+        else:
+            return jsonify({
+                "msg": "Not Implemented..."
+            }), 501
