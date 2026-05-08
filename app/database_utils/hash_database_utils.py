@@ -11,8 +11,10 @@ def add_hash_to_database(database: Database, hash: Hash) -> None:
     """
 
     write_data = hash.to_dict()
-    database.set_active_collection('hashes')
-    database.insert_one(query=write_data)
+    database.insert_one(
+        collection="hashes",
+        query=write_data
+    )
 
 
 def how_many_hashes_above(database: Database, border: int) -> int:
@@ -26,9 +28,10 @@ def how_many_hashes_above(database: Database, border: int) -> int:
     Returns:
         int: Number of documents with 'counts' greater than the border.
     """
-
-    database.set_active_collection('hashes')
-    count = database.count(query={"counts": {"$gt": border}})
+    count = database.count(
+        collection="hashes",
+        query={"counts": {"$gt": border}}
+    )
 
     return count
 
@@ -46,9 +49,8 @@ def get_hashes_in_ranges(database: Database, start_index: int, end_index: int, s
     Returns:
         list[Hash]: A list of Hash instances retrieved from the database.
     """
-
-    database.set_active_collection('hashes')
     results: dict = database.find(
+            collection="hashes",
             query={},
             sort=sort_data,
             skip=start_index,
@@ -76,8 +78,10 @@ def is_hash_in_database(database: Database, word: str) -> bool:
         bool: Return True if hash is already in the database.
     """
 
-    database.set_active_collection('hashes')
-    result = database.find_one(query={"word": word})
+    result = database.find_one(
+        collection='hashes',
+        query={"word": word}
+    )
     if not result:
         return False
     return True
@@ -93,6 +97,5 @@ def count_all_hashes(database: Database) -> int:
     Returns:
         int: The total number of hashes stored in the database.
     """
-
-    database.set_active_collection('hashes')
-    return database.count()
+    
+    return database.count(collection='hasehs')

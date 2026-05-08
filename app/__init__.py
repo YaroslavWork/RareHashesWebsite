@@ -23,6 +23,7 @@ def create_app():
     # --- Load .env ---
     load_dotenv()
     app.config['DATABASE_IP_AND_PORT'] = os.getenv('DATABASE_IP_AND_PORT')
+    app.config['DATABASE_NAME'] = os.getenv('DATABASE_NAME')
     app.config['DATABASE_LOGIN'] = os.getenv('DATABASE_LOGIN')
     app.config['DATABASE_PASSWORD'] = os.getenv('DATABASE_PASSWORD')
     app.config['HOST'] = os.getenv('HOST')
@@ -41,6 +42,7 @@ def create_app():
 
     # --- Database configuration ---
     database = Database(
+        name=app.config['DATABASE_NAME'],
         login=app.config['DATABASE_LOGIN'],
         ip_and_port=app.config['DATABASE_IP_AND_PORT']
     )   

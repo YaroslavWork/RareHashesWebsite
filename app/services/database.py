@@ -4,17 +4,14 @@ from pymongo.synchronous.collection import Collection
 from app.utils.notification import log
 
 class Database:
-    DATABASE_NAME = 'hashes'
-    COLLECTION_NAME = 'hashes'
+    def __init__(self, name: str, login: str, ip_and_port: str) -> None:
 
-    def __init__(self, login: str, ip_and_port: str) -> None:
-
+        self.__name: str = name
         self.__login: str = login
         self.__ip_and_port: str = ip_and_port
         
         self.__client: MongoClient = MongoClient()
         self.__database = None
-        self.__active_collection = None
 
         self.__is_connected: bool = False
 
@@ -28,13 +25,10 @@ class Database:
         ip, port = ip_and_port.split(':')
         port = int(port)
         self.__ip_and_port = f"{ip}:{port}"
-
-    def set_active_collection(self, collection_name: str) -> None:
-        self.__active_collection = self.__database[collection_name]
     
     def connect(self, password: str) -> None:
-        MONGO_URI = f'mongodb://{self.__login}:{password}@{self.__ip_and_port}/{Database.DATABASE_NAME}?authSource=admin'
-        
+        MONGO_URI = f'mongodb://{self.__login}:{password}@{self.__ip_and_port}/{self.__name}?authSource=admin'
+        print(MONGO_URI)
         try:
             self.__client = MongoClient(MONGO_URI)
             self.__database = self.__client.get_database()
@@ -44,13 +38,18 @@ class Database:
             self.__is_connected = False
             log("Database", f"Error connecting to MongoDB: {e}")
 
-    def find(self, query: dict, sort: list = None, skip: int = 0, limit: int = 0) -> list:
+    def __check_connection(self, collection: str) -> None:
         if not self.is_connected:
             raise ConnectionError("Database: Not connected to the database.")
-        if self.__active_collection is None:
+
+    def find(self, collection: str, query: dict, sort: list = None, skip: int = 0, limit: int = 0) -> list:
+        self.__check_connection(collection)
+
+        if collection is None:
             raise ValueError("Database: Active collection is not set.")
-        
-        cursor = self.__active_collection.find(query)
+
+
+        cursor = self.__database[collection].find(query)
         if sort:
             cursor.sort(sort)
         cursor.skip(skip)
@@ -59,17 +58,22 @@ class Database:
 
         return list(cursor)
     
-    def find_one(self, query: dict):
-        return self.__active_collection.find_one(query)
+    def find_one(self, collection: str, query: dict):
+        self.__check_connection(collection)
+        return self.__database[collection].find_one(query)
     
-    def insert_one(self, query: dict):
-        self.__active_collection.insert_one(query)
+    def insert_one(self, collection: str, query: dict):
+        self.__check_connection(collection)
+        self.__database[collection].insert_one(query)
     
-    def count(self, query: dict = {}) -> int:
-        return self.__active_collection.count_documents(query)
+    def count(self, collection: str, query: dict = {}) -> int:
+        self.__check_connection(collection)
+        return self.__database[collection].count_documents(query)
 
-    def delete_one(self, filter: dict = {}):
-        self.__active_collection.delete_one(filter)
+    def delete_one(self, collection: str, filter: dict = {}):
+        self.__check_connection(collection)
+        self.__database[collection].delete_one(filter)
 
-    def delete(self, filter: dict = {}):
-        self.__active_collection.delete_many(filter)
+    def delete(self, collection: str, filter: dict = {}):
+        self.__check_connection(collection)
+        self.__database[collection].delete_many(filter)

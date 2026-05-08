@@ -4,3 +4,4 @@ app/static/images/*
 ssl/*
 hypercorn_run.sh
 logs.txt
+venv
