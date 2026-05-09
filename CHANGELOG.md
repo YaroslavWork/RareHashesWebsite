@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.13.0] - 2026-05-09
+- Update **requiremets.txt**
+- Add new file **extension.py** and **app/models/user.py**
+- Make service variable global from **extension.py**
+- Add new model *User* to project.
+- Initialize new mechanics: Authentification
+- Change telegramAPI variables to telegram_api to stick to conventions (PEP 8)
+- Add init functions to service to init after class is created
+
+
+## [v2.12.8] - 2026-05-08
+- Remove hardcoded database_name and database_collections moving to .env variable
+- Insert collections to all database functions to make sure parallel running does not write data into wrong collections
+- Create running script for linux for local testing and running
+- Update gitgnore for local virtual environment
+- Update database utils for new functions inside database services
+
 ## [v2.12.7] - 2025-06-23
 - Update instruction in telegram notification second time
 

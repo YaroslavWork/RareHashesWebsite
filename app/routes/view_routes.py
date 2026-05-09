@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for, current_app
 
+from app.extensions import database
 from app.database_utils.hash_database_utils import get_hashes_in_ranges, count_all_hashes
 
 view_bp = Blueprint("view", __name__)
@@ -17,7 +18,6 @@ def view_with_params(page: int):
     """View route (with parameters) [/view/<int:page>?<parameters>]: A list of hashes"""
 
     row_in_one_page_limit = current_app.config['ROW_IN_ONE_PAGE_LIMIT']
-    database = current_app.config['DATABASE']
 
     sort_data = []
     sort_args = ['word', 'isFromBeginning', 'counts', 'hashType', 'user', 'createdAt']

@@ -12,7 +12,7 @@ class TelegramAPI:
     A class to handle communication with the Telegram API using RabbitMQ.
     """
 
-    def __init__(self, rabbit_login: str, rabbit_host: str) -> None:
+    def __init__(self, rabbit_login: str = None, rabbit_host: str = None) -> None:
         """
         Initialize the TelegramAPI instance.
         This constructor sets up the RabbitMQ connection parameters and initializes the queues for incoming and outgoing messages.
@@ -33,6 +33,10 @@ class TelegramAPI:
         self.__queue_income = []
         self.__queue_outcome = []
 
+    def init(self, rabbit_login: str, rabbit_host: str) -> None:
+        self.__rabbit_host = rabbit_host
+        self.__rabbit_login = rabbit_login
+    
     async def open_connection(self, rabbit_password: str) -> None:
         """
         Open a connection to the Telegram API using RabbitMQ.

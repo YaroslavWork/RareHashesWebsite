@@ -4,7 +4,7 @@ from pymongo.synchronous.collection import Collection
 from app.utils.notification import log
 
 class Database:
-    def __init__(self, name: str, login: str, ip_and_port: str) -> None:
+    def __init__(self, name: str = None, login: str = None, ip_and_port: str = None) -> None:
 
         self.__name: str = name
         self.__login: str = login
@@ -14,6 +14,11 @@ class Database:
         self.__database = None
 
         self.__is_connected: bool = False
+
+    def init(self, name: str, login: str, ip_and_port: str) -> None:
+        self.__name = name
+        self.__login = login
+        self.__ip_and_port = ip_and_port
 
     def set_login(self, login: str) -> None:
         self.__login = login
@@ -27,8 +32,10 @@ class Database:
         self.__ip_and_port = f"{ip}:{port}"
     
     def connect(self, password: str) -> None:
-        MONGO_URI = f'mongodb://{self.__login}:{password}@{self.__ip_and_port}/{self.__name}?authSource=admin'
-        print(MONGO_URI)
+        if self.__login and self.__name and self.__ip_and_port:
+            MONGO_URI = f'mongodb://{self.__login}:{password}@{self.__ip_and_port}/{self.__name}?authSource=admin'
+        else:
+            raise ValueError("Not enought data to initialize database.")
         try:
             self.__client = MongoClient(MONGO_URI)
             self.__database = self.__client.get_database()

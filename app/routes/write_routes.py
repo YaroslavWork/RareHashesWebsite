@@ -2,6 +2,7 @@ from flask import request, render_template, jsonify, Blueprint, current_app
 from datetime import datetime
 import asyncio
 
+from app.extensions import telegram_api, database
 from app.utils.hash_utils import get_sha256_hash, convert_hex_to_binary, count_repeated_pattern_from_start
 from app.database_utils.hash_database_utils import add_hash_to_database, how_many_hashes_above, is_hash_in_database
 from app.telegram_utils.notification_service_utils import add_new_hash
@@ -21,8 +22,6 @@ def write():
     max_word_length = current_app.config['MAX_WORD_LENGTH']
     max_user_length = current_app.config['MAX_USER_LENGTH']
     min_repeated_signs = current_app.config['MIN_REPEATED_SIGNS']
-    database = current_app.config['DATABASE']
-    telegramAPI = current_app.config['TELEGRAMAPI']
 
     hash = Hash()
 
@@ -70,7 +69,7 @@ def write():
     top: int = how_many_hashes_above(database=database, border=hash.counts) + 1
 
     # Send to a telegram bot
-    add_new_hash(telegramAPI=telegramAPI, hash=hash, top=top)
+    add_new_hash(telegram_api=telegram_api, hash=hash, top=top)
 
     # Add to database
     try:

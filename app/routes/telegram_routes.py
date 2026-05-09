@@ -2,6 +2,7 @@ import threading
 import queue
 from flask import Blueprint, jsonify, render_template, request, current_app
 
+from app.extensions import telegram_api
 from app.telegram_utils.notification_service_utils import add_new_user, remove_user, change_rule, wait_until_response
 
 telegram_bp = Blueprint("telegram", __name__)
@@ -16,7 +17,6 @@ async def telegram_notification_service():
     
     if request.method == 'POST':
         max_telegramID_length = current_app.config['MAX_TELEGRAMID_LENGTH']
-        telegramAPI = current_app.config['TELEGRAMAPI']
 
         data = request.get_json()
 
@@ -48,8 +48,8 @@ async def telegram_notification_service():
                 return jsonify({"msg": "'minimum_value' must be in a range between 1 and 100 000 000."}), 400
 
         if telegram_operation == 'add':
-            message_uuid: str = add_new_user(telegramAPI, telegramID, rule_type, minimum_value)
-            value = await wait_until_response(telegramAPI, message_uuid, max_time_in_seconds=5)
+            message_uuid: str = add_new_user(telegram_api, telegramID, rule_type, minimum_value)
+            value = await wait_until_response(telegram_api, message_uuid, max_time_in_seconds=5)
             if value == 0:
                 return jsonify({
                     "errno": 0,
@@ -76,8 +76,8 @@ async def telegram_notification_service():
                 }), 501
     
         elif telegram_operation == 'remove':
-            message_uuid: str = remove_user(telegramAPI, telegramID)
-            value = await wait_until_response(telegramAPI, message_uuid, max_time_in_seconds=5)
+            message_uuid: str = remove_user(telegram_api, telegramID)
+            value = await wait_until_response(telegram_api, message_uuid, max_time_in_seconds=5)
             if value == 0:
                 return jsonify({
                     "errno": 4,
@@ -100,8 +100,8 @@ async def telegram_notification_service():
                 }), 400
             
         elif telegram_operation == 'change':
-            message_uuid: str = change_rule(telegramAPI, telegramID, rule_type, minimum_value)
-            value = await wait_until_response(telegramAPI, message_uuid, max_time_in_seconds=5)
+            message_uuid: str = change_rule(telegram_api, telegramID, rule_type, minimum_value)
+            value = await wait_until_response(telegram_api, message_uuid, max_time_in_seconds=5)
             if value == 0:
                 return jsonify({
                     "errno": 8,
