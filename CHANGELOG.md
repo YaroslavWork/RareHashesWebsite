@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.14.0] - 2026-05-11
+- Add new file **user_database.py**, **register_routes.py**, **register.html** and **register.js**
+- Add register routes to app
+- Correct load_user function for flask-login
+- Add new database utils for users like find user by id and username and create new user
+- Add /register GET and POST
+- Validate data (username, email, password)
+- Create frontend for register page (by AI)
+
 ## [v2.13.0] - 2026-05-09
 - Update **requiremets.txt**
 - Add new file **extension.py** and **app/models/user.py**

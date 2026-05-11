@@ -16,6 +16,7 @@ class User(UserMixin):
         self.id: str = str(_id) if _id else None  # For Flask
         self._id: ObjectId = _id
         self.username: str = username
+        self.email: str = email
         self.password: str = password
         self.image_bytes: bytes = image_bytes
         self.attached_bots_id: [ObjectId] = attached_bots_id

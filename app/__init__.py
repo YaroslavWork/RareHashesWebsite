@@ -1,4 +1,5 @@
 from flask import Flask
+from bson import ObjectId
 from flask_login import LoginManager, UserMixin
 from dotenv import load_dotenv
 import time
@@ -9,6 +10,7 @@ import threading
 from app.extensions import login_manager, database, telegram_api
 from app.models.user import User
 from app.utils.notification import log
+from app.database_utils.user_database_utils import get_user_by_id
 
 
 def start_telegramAPI_loop(telegramAPI, password):
@@ -21,8 +23,7 @@ def start_telegramAPI_loop(telegramAPI, password):
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_data = db.users.find_one({"_id": ObjectId(user_id)})
-    return User.from_dict(user_data) if user_data else None
+    return get_user_by_id(database, user_id)
 
 
 def create_app():
@@ -84,11 +85,13 @@ def create_app():
     from app.routes.telegram_routes import telegram_bp
     from app.routes.write_routes import write_bp
     from app.routes.view_routes import view_bp
+    from app.routes.register_routes import register_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(telegram_bp)
     app.register_blueprint(write_bp)
     app.register_blueprint(view_bp)
+    app.register_blueprint(register_bp)
 
 
     return app
