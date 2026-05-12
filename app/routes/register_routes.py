@@ -2,7 +2,7 @@ import re
 from flask import Blueprint, render_template, request, jsonify
 
 from app.extensions import database
-from app.database_utils.user_database_utils import check_user_exists_by_username, create_user
+from app.database_utils.user_database_utils import check_user_exists_by_username, check_user_exists_by_email, create_user
 from app.models.user import User
 
 register_bp = Blueprint("register", __name__)
@@ -40,6 +40,8 @@ def register():
         
         if check_user_exists_by_username(database, username):
             return jsonify({"error": "Username already exists."}), 400
+        if check_user_exists_by_email(database, email):
+            return jsonify({"error": "Email already exists."}), 400
         
 
         # Create new user
