@@ -44,6 +44,7 @@ def register():
 
         # Create new user
         new_user = User(username=username, password=password, email=email)
+        new_user.hash_password(password)  # Hash the password before storing
         create_user(database, new_user)
 
         return jsonify({"message": "User created successfully."}), 201

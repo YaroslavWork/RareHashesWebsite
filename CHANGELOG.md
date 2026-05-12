@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.14.1] - 2026-05-12
+- Use hash encyprion for password to ensure password in database stored as a hash.
+
 ## [v2.14.0] - 2026-05-11
 - Add new file **user_database.py**, **register_routes.py**, **register.html** and **register.js**
 - Add register routes to app
