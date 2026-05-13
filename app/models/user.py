@@ -23,7 +23,7 @@ class User(UserMixin):
         self.collections: [ObjectId] = collections
         self.money: int = money
 
-    def set_password(self, password: str) -> None:
+    def hash_password(self, password: str) -> None:
         self.password = generate_password_hash(password)
 
     def check_password(self, password: str) -> bool:

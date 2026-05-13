@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.14.2] - 2026-05-12
+- Add validation for unique email when user register.
+
 ## [v2.14.1] - 2026-05-12
 - Use hash encyprion for password to ensure password in database stored as a hash.
 

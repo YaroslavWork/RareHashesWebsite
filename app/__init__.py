@@ -86,12 +86,13 @@ def create_app():
     from app.routes.write_routes import write_bp
     from app.routes.view_routes import view_bp
     from app.routes.register_routes import register_bp
+    from app.routes.login_routes import login_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(telegram_bp)
     app.register_blueprint(write_bp)
     app.register_blueprint(view_bp)
     app.register_blueprint(register_bp)
-
+    app.register_blueprint(login_bp)
 
     return app
