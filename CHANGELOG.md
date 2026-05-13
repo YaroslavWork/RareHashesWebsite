@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.15.0] - 2026-05-13
+- Add new file **login_routes.py**, **login.html** and **login.js**
+- Add login routes to app
+- Add /login GET and POST
+- Add user utils: check_user_exists_by_email, check_user_credentials, get_user_by_username
+- Rename in user model function set_password to hash_password
+- Create frontend for login page (by AI)
+
 ## [v2.14.2] - 2026-05-12
 - Add validation for unique email when user register.
 
