@@ -112,8 +112,6 @@ This combination highlights advanced backend processing, database management, an
 
     Create **rareHashes.crt** and **rareHashes.key** with, for example, `openssl` and put them in the **./ssl** directory.
 
----
-
 ### Usage
 
 1. Install Docker (on Arch):
@@ -174,6 +172,8 @@ This project follows an MVC-inspired architecture. The entry point is **main.py*
 - **app/models/*** - Static classes used to organize and structure data for convenience;
 - **app/__init__.py** - Initializes the Flask app and registers Blueprints for modular organization;
 - **Dockerfile** and **requirements.txt** - Used to build and run the application in Docker containers;
+- **requirements-dev.txt** - Development dependencies (includes **requirements.txt** and adds `pytest`);
+- **run.sh** - Local development runner (Hypercorn) reading `HOST` from **.env**;
 - **tests/*** - Unit tests for this project.
 
 ---
@@ -181,7 +181,15 @@ This project follows an MVC-inspired architecture. The entry point is **main.py*
 ### Dependencies
 
 - Python 3.10.9 (later versions have a problem with hashlib dependencies)
-- All Python modules are listed in **requirements.txt**.
+- All runtime Python modules are listed in **requirements.txt**. Docker images install only this file.
+- Development and testing modules (with `pytest`) are listed in **requirements-dev.txt**, which includes **requirements.txt**.
+
+For development:
+```sh
+python3 -m venv venv
+venv/bin/pip install -r requirements-dev.txt
+venv/bin/python -m pytest -v
+```
 
 ---
 

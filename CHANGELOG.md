@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.15.2] - 2026-11-11 (by AI)
+- Add new file **requirements-dev.txt** with development dependencies (includes **requirements.txt**)
+- Add **pytest** and its dependencies to development requirements
+- Read the bind address from `HOST` in **.env** instead of the hardcoded port in **run.sh**
+- Resolve the virtual environment and certificates relative to **run.sh** location
+- Validate missing Hypercorn, missing **.env**, missing certificates and wrong arguments in **run.sh** with clear error messages
+- Fix `--withssl` parsing in **run.sh** when the value is omitted or the option is the last argument
+
 ## [v2.15.1] - 2026-11-11
 - Add AI rules to project (by AI)
 

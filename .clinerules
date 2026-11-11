@@ -27,8 +27,10 @@ depend on them (see §6).
 
 - Python **3.10.9** is the pinned target (`Dockerfile`). The code uses PEP 585/604 generics
   (`str | None`, `list[str]`), so nothing newer than 3.10 syntax.
-- Dependencies come only from `requirements.txt` (Flask, Flask-Login, pymongo, aio-pika,
-  python-dotenv, Werkzeug, Hypercorn). **Do not add a third-party dependency** unless asked.
+- Dependencies come only from `requirements.txt` (runtime) and `requirements-dev.txt` (runtime +
+  `pytest`; includes `requirements.txt`). Runtime packages: Flask, Flask-Login, pymongo, aio-pika,
+  python-dotenv, Werkzeug, Hypercorn. **Do not add a third-party dependency** unless asked, and put
+  test-only packages in `requirements-dev.txt`, never in `requirements.txt`.
 - Configuration is read from `.env` via `os.getenv` inside `create_app()` (`app/__init__.py`).
   Never print, log or commit secrets.
 
@@ -42,7 +44,8 @@ depend on them (see §6).
 
 Notes:
 
-- `pytest` is **not** in `requirements.txt` — install it in the venv before running tests.
+- `pytest` lives in `requirements-dev.txt` only (`venv/bin/pip install -r requirements-dev.txt`);
+  it is deliberately absent from `requirements.txt` so the Docker image stays runtime-only.
 - Route tests call the real `create_app()`, so they need a live MongoDB; without RabbitMQ every
   telegram-related test fails. Report that instead of silently skipping them.
 - `create_app()` starts a **non-daemon** reconnect thread (`start_telegramAPI_loop`), so a script that
