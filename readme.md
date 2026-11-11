@@ -18,99 +18,11 @@ This combination highlights advanced backend processing, database management, an
 
 ---
 
-### Installation (for Linux)
+### Installation
 
-1. Install MongoDB (on Ubuntu):
+Click Here[https://app.notion.com/p/Linux-Installation-Process-4157e2027a0d80ca986cc3197471b731?t=4157e2027a0d80ac897000a9d6b39560] to see installation process for linux
 
-    [Follow installation process.](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/)
-
-2. Run MongoDB:
-
-    To start and enable it to run on startup:
-    ```
-    sudo systemctl start mongod
-    sudo systemctl enable mongod
-    ```
-
-3. Create admin access:
-
-    Connect to the mongo shell:
-    ```
-    mongosh
-    ```
-
-    Run inside mongosh:
-    ```
-    use admin
-
-    db.createUser({
-        user: "admin_login",
-        pwd: "superVeryStrongPassword",
-        roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
-    })
-    ```
-
-    Enable authentication: 
-    ```sh
-    sudo nano /etc/mongod.conf
-    ```
-
-    Find the security section and add:
-    ```yaml
-    security:
-        authorization: "enabled"
-    ```
-
-    Apply changes:
-    ```
-    sudo systemctl restart mongod
-    ```
-
-4. Create user access for the database:
-
-    Inside the Mongo shell connected as admin:
-    ```
-    use hashes
-
-    db.createUser({
-        user: "database_login",
-        pwd: "veryStrongPassword",
-        roles: [ { role: "readWrite", db: "hashDatabase" } ]
-    })
-    ```
-
-5. Launch Telegram Bot (Optional):
-
-    [See installation process.](https://github.com/YaroslavWork/RareHashesTelegramBot)
-
-6. Create a **.env** file:
-
-    This file contains all necessary private information. Your **.env** must contain:
-
-    ```
-    DATABASE_IP_AND_PORT=127.0.0.1:25000
-    DATABASE_LOGIN=database_login
-    DATABASE_PASSWORD=veryStrongPassword
-    HOST=127.0.0.1:5000
-    RABBIT_LOGIN=webServer
-    RABBIT_PASSWORD=insanelyStrongPassword
-    RABBIT_HOST=127.0.0.1:5672
-    DEBUG=False
-    ```
-
-    This configuration file contains:
-    - `DATABASE_IP_AND_PORT` - connection to the MongoDB database. This database must have a collection 'hashes';
-    - `DATABASE_LOGIN` - login for MongoDB;
-    - `DATABASE_PASSWORD` - password for MongoDB;
-    - `HOST` - site domain;
-    - `RABBIT_LOGIN` - login for RabbitMQ communicator (see below);
-    - `RABBIT_PASSWORD` - password for RabbitMQ communicator (see below);
-    - `RABBIT_HOST` - connection to RabbitMQ communicator (see below);
-    - `DEBUG` - debugging for developers;
-
-7. Create SSL certificates:
-
-    Create **rareHashes.crt** and **rareHashes.key** with, for example, `openssl` and put them in the **./ssl** directory.
+To deal with SSL certificates create **rareHashes.crt** and **rareHashes.key** with, for example, `openssl` and put them in the **./ssl** directory.
 
 ### Usage
 
