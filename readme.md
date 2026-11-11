@@ -20,7 +20,7 @@ This combination highlights advanced backend processing, database management, an
 
 ### Installation
 
-Click Here[https://app.notion.com/p/Linux-Installation-Process-4157e2027a0d80ca986cc3197471b731?t=4157e2027a0d80ac897000a9d6b39560] to see installation process for linux
+Click **[Here](https://app.notion.com/p/Linux-Installation-Process-4157e2027a0d80ca986cc3197471b731?t=4157e2027a0d80ac897000a9d6b39560)** to see installation process for linux
 
 To deal with SSL certificates create **rareHashes.crt** and **rareHashes.key** with, for example, `openssl` and put them in the **./ssl** directory.
 
