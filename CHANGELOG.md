@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.15.3] - 2026-11-11 
+- Fix annotation problem inside **user.py**
+
 ## [v2.15.2] - 2026-11-11 (by AI)
 - Add new file **requirements-dev.txt** with development dependencies (includes **requirements.txt**)
 - Add **pytest** and its dependencies to development requirements
