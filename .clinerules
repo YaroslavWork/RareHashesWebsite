@@ -1,0 +1,205 @@
+# Project Rules — Rare Hashes Website
+
+Rules for AI agents working in this repository. Derived from the existing codebase, the
+`readme.md` project structure and the `CHANGELOG.md` history. When something here conflicts
+with actual code, **the code wins** — follow what the surrounding module already does and
+mention the discrepancy instead of "fixing" it silently.
+
+---
+
+## 1. What this project is
+
+A Flask (server-rendered + JSON API) website that stores SHA-256 hashes which start with at
+least 25 identical bits (`0` or `1`). It is one service of a 3-part microservice system:
+
+| Component | Responsibility |
+| --- | --- |
+| **This repo** (web server) | HTML pages, JSON APIs, MongoDB persistence, publishing commands to RabbitMQ |
+| `RareHashesTelegramBot` (separate repo) | Consumes `website_to_telegram`, answers on `telegram_to_website` |
+| `RareHashFinder` (separate repo) | Brute-forces rare hashes and writes them to MongoDB directly |
+
+Never change the RabbitMQ message format or queue names unilaterally — two external services
+depend on them (see §6).
+
+---
+
+## 2. Environment & commands
+
+- Python **3.10.9** is the pinned target (`Dockerfile`). The code uses PEP 585/604 generics
+  (`str | None`, `list[str]`), so nothing newer than 3.10 syntax.
+- Dependencies come only from `requirements.txt` (Flask, Flask-Login, pymongo, aio-pika,
+  python-dotenv, Werkzeug, Hypercorn). **Do not add a third-party dependency** unless asked.
+- Configuration is read from `.env` via `os.getenv` inside `create_app()` (`app/__init__.py`).
+  Never print, log or commit secrets.
+
+| Task | Command (from repo root) |
+| --- | --- |
+| Run dev server | `./run.sh` or `./run.sh --withssl y` (Hypercorn, `main:app`, port 6798) |
+| Run entry point directly | `venv/bin/python main.py` (needs certificates in `./ssl`) |
+| Docker | `docker build -t web-server .` / `docker run -d --name web-server-cont -p 6798:6798 web-server` |
+| Unit tests without DB/RabbitMQ | `python -m pytest -v tests/test_utils tests/test_models` |
+| Full suite (needs MongoDB + RabbitMQ) | `python -m pytest -v` |
+
+Notes:
+
+- `pytest` is **not** in `requirements.txt` — install it in the venv before running tests.
+- Route tests call the real `create_app()`, so they need a live MongoDB; without RabbitMQ every
+  telegram-related test fails. Report that instead of silently skipping them.
+- `create_app()` starts a **non-daemon** reconnect thread (`start_telegramAPI_loop`), so a script that
+  only calls `create_app()` never exits. For smoke checks use the Flask test client, e.g.
+  `venv/bin/python -c "from app import create_app; print(create_app().test_client().get('/').status_code)"`
+  or wrap the process in `timeout`.
+
+---
+
+## 3. Directory layout & where code goes
+
+```
+main.py                      # entry point: create_app() + SSL + app.run
+app/__init__.py              # app factory: load .env, config, init services, register blueprints
+app/extensions.py            # single shared instances: login_manager, database, telegram_api
+app/models/                  # data holders (Hash, User) — no I/O, no Flask imports
+app/services/                # infrastructure classes (Database, TelegramAPI) — connection logic
+app/routes/                  # Flask blueprints: HTTP parsing, validation, response formatting
+app/database_utils/          # functions that query the DB *through* the Database service
+app/telegram_utils/          # functions that build messages for the TelegramAPI service
+app/utils/                   # pure helpers (hashing, uuid, logging)
+app/templates/               # Jinja2 HTML pages
+app/static/                  # style.css and one JS file per page
+tests/                       # flat test dirs mirroring app/ (test_routes, test_utils, ...)
+```
+
+- **Every new page/feature = one blueprint** in `app/routes/<name>_routes.py` with
+  `<name>_bp = Blueprint("<name>", __name__)`, registered inside `create_app()` next to the others.
+- **Data → `app/models`**, **connection/infra → `app/services`**, **DB queries → `app/database_utils`**,
+  **RabbitMQ payloads → `app/telegram_utils`**. Routes must never import `pymongo`/`aio_pika`.
+- Services are never instantiated in routes; import the shared objects from `app.extensions`.
+- New DB/telegram operations are module-level functions taking the service as the **first
+  argument** (`database`, `telegram_api`) so they stay easy to test.
+- Limits live in `app.config` (set in `create_app()`) and are read via `current_app.config['...']`.
+  Existing keys: `MIN_REPEATED_SIGNS`, `MAX_USER_LENGTH`, `MAX_TELEGRAMID_LENGTH`,
+  `MAX_WORD_LENGTH`, `ROW_IN_ONE_PAGE_LIMIT`. Never hardcode a limit that already exists there.
+- Collection names are passed explicitly on every `Database` call
+  (`database.find(collection="hashes", ...)`). Never reintroduce an "active collection" singleton.
+
+---
+
+## 4. Python style conventions (match existing code)
+
+- 4-space indentation, no formatter config in repo — keep files consistent with their neighbours.
+- Naming: `snake_case` functions/variables **including service names** (`telegram_api`, `database`);
+  `PascalCase` classes; modules in `snake_case`. External/legacy keys stay camelCase
+  (`hashType`, `isFromBeginning`, `createdAt`, request payload keys) — they are part of the JSON/DB
+  contract; never rename a field without a migration plan.
+- Private members of services use a double-underscore prefix (`self.__queue_income`) and are only
+  touched through public methods; add a public method instead of reaching into `_ClassName__x`.
+- Type hints on public service/model/util functions and return values (`-> None`, `-> bool`,
+  `-> list[Hash]`, `str | None`). Simple route handlers may omit them, like the existing code.
+- Docstrings: triple-quoted Google style (`Description:` / `Args:` / `Returns:` / `Logs:`) for
+  services, models, database utils, telegram utils and utils. Routes use the short one-liner form:
+  `"""GET: Write route [/write]: Hash form;\nPOST: Write route [/write] {[word, user, hashType]}: Hash form"""`.
+- Logging: use `log(title, message)` from `app.utils.notification`; no bare `print()` in new code.
+  Title = component name (`"Database"`, `"TelegramAPI"`, `"RabbitMQ"`, `"HashModel"`). Existing
+  `print()` calls are known leftovers — remove them only when already touching that code.
+- Exceptions: validate input and return early; catch broad `Exception` only at the route boundary
+  where a user-facing 4xx/5xx is produced. Never leave a bare `except:` in new code.
+
+---
+
+## 5. Routes / API conventions
+
+- Declare `methods=[...]` explicitly on `@bp.route`, then branch on `request.method`
+  (`GET` renders a template, `POST` handles JSON).
+- Read the body with `data = request.get_json()` and `data.get('key', None)`; never index directly.
+- Validation order used everywhere: presence → type/format → length → domain rules (e.g. duplicate
+  check) → business rules (e.g. is the hash rare enough). Return the first failure.
+- Error responses are JSON `{"msg": "..."}` (plus `"errno": <int>` where the flow already uses it):
+  `400` bad input, `401` bad credentials, `200` ok, `201` created, `500` DB unavailable,
+  `503` external service unavailable, `501` not implemented. Frontend JS branches on `errno`, so
+  keep existing numeric codes stable and continue the sequence for new cases in the same endpoint.
+- New pages must be linked via `url_for('<blueprint>.<view>')`; assets via
+  `{{ url_for('static', filename='...') }}`.
+- Auth uses Flask-Login (`login_manager` in `app/extensions.py`, user loader from
+  `get_user_by_id`). Protect private pages with `@login_required`; passwords only through
+  `User.hash_password` / `User.check_password` (never store or log plaintext).
+- Do not break existing URLs: `/`, `/view`, `/view/<int:page>`, `/write`,
+  `/telegram_notification_service`, `/register`, `/login`.
+
+---
+
+## 6. Data & cross-service contracts (do not change silently)
+
+- MongoDB collections: `hashes`, `users`. Hash document fields (match `Hash.to_dict()`):
+  `word`, `isFromBeginning`, `counts`, `hashType`, `createdAt`, `user` (empty string when absent).
+  User document fields (match `User.to_dict()`): `username`, `email`, `password` (hashed),
+  `image`, `attached_bots_id`, `collections`, `money`.
+- Models expose `to_dict()` / `from_dict()` (Hash: instance method, User: `@staticmethod`) and
+  `Hash.is_complete()` honouring `Hash.ignore_vars`. Keep models free of Flask/Mongo client logic
+  (`ObjectId` typing in `User` is the accepted exception).
+- RabbitMQ: publish via `telegram_api.add_to_queue(...)`; consume via
+  `wait_for_matching_message(...)` / `wait_until_response(...)`. Queues: outgoing
+  `website_to_telegram`, incoming `telegram_to_website`. Message layout:
+  `<uuid>|<OP>|<id>|NEXT|<field>|NEXT|...` with `<OP>` in `ADD`, `REM`, `CHN`, `NEW` and rule
+  prefixes `M<value>` (rarity) / `T<value>` (ranking). Reply: `<uuid>|suc|...` or
+  `<uuid>|errno|<code>|...`. Any change must be coordinated with the Telegram bot repo — flag it.
+
+---
+
+## 7. Frontend conventions
+
+- One JS file per page in `app/static/`, named after the page (`write.js`, `view.js`, `login.js`,
+  `telegram_notification_service.js`). Element handles as `const` at the top.
+- Plain `fetch` with `Content-Type: application/json`. Older files use `.then` chains, newer ones
+  `async/await` — follow the file you are editing; don't rewrite working code for style alone.
+- Client-side validation is UX only; the server stays the source of truth. Mirror the server limits
+  in JS (255 word, 31 user, 32 telegram ID).
+- Styling lives in `app/static/style.css` (gradient background, rounded `#header`, `.mainButton`).
+  Reuse the header markup from `view.html` / `index.html` and existing classes instead of adding
+  inline styles.
+- User-visible text in English; error messages state what is wrong and end with a period.
+
+---
+
+## 8. Tests
+
+- Framework: `pytest`, plain functions, one file per module at `tests/<area>/test_<module>.py`.
+- Every test file starts with the existing path bootstrap (there are no `__init__.py` files):
+  ```python
+  import pytest
+  import sys
+  import os
+
+  sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+  ```
+- Route tests use a `start` fixture: `app = create_app()`, then
+  `with app.test_client() as client: yield client, app`.
+- Group assertions with comments in this order: `# Basics`, `# Unusual`, `# Edge cases`, plus
+  `# Raises` with `pytest.raises(...)` (see `tests/test_utils/test_hash_utils.py`).
+- Prefer hardcoded expected values (e.g. the literal SHA-256 digest) over recomputing them with the
+  function under test. Delete DB documents created by a test at the end.
+- New feature → add/extend a test in the matching `tests/` subfolder. In the final summary state
+  which tests ran and which were blocked by missing MongoDB/RabbitMQ.
+
+---
+
+## 9. Documentation & history
+
+- **Every user-visible change updates `CHANGELOG.md`**: new top section
+  `## [vX.Y.Z] - YYYY-MM-DD` above the previous one, bullets in the existing style (bold file names,
+  imperative sentences, one change per bullet). Bump `MINOR` for features, `PATCH` for fixes.
+- Update `readme.md` when structure, setup steps, `.env` variables, dependencies or endpoints change
+  (`### Project Structure`, `### Installation (for Linux)`, `### Dependencies`).
+- New `.env` variables must be loaded in `create_app()`, documented in `readme.md` step 6 and never
+  committed (real `.env` is gitignored).
+
+---
+
+## 10. Definition of done for a task
+
+1. Code lives in the correct layer (§3) and follows §4–§7 without inventing new patterns.
+2. Relevant tests added/updated and executed, or explicitly reported as blocked by external services.
+3. `CHANGELOG.md` updated; `readme.md` updated if behaviour/setup changed.
+4. No secrets, logs (`logs.txt`), `venv/`, `__pycache__/` or generated files added to git.
+5. `venv/bin/python -m compileall -q app main.py` (or importing the changed modules) passes before
+   reporting success.
+6. Final summary lists changed files, commands run, test results and any assumptions/trade-offs.

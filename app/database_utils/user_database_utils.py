@@ -62,7 +62,6 @@ def check_user_credentials(database: Database, username: str, password: str) -> 
         return False
     
     user = User.from_dict(user_data)
-    print("CHECK_PASSWORD", password)
     return user.check_password(password)
 
 
