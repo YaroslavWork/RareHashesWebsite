@@ -2,7 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v2.15.6] - 2026-11-12
+## [v2.15.8] - 2026-11-13
+- Remove failure scenario from **notification.py** where logs can crash the server or make some parts of program corrupted
+
+## [v2.15.7] - 2026-11-12
 - Fix typo inside **hash_data_utils.py**
 
 ## [v2.15.6] - 2026-11-11

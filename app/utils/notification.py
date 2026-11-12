@@ -1,4 +1,7 @@
+import threading
 from datetime import datetime
+
+_write_lock = threading.Lock()
 
 def log(title: str, message: str, with_timestamp: bool = True, save_to_file: bool = True) -> None:
     """
@@ -21,5 +24,8 @@ def log(title: str, message: str, with_timestamp: bool = True, save_to_file: boo
     print(text)
 
     if save_to_file:
-        with open("./logs.txt", 'a') as file:
-            file.write(f'{text}\n')
+        try:
+            with _write_lock, open("./logs.txt", 'a') as file:
+                file.write(f'{text}\n')
+        except OSError:
+            pass 
