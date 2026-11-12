@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v2.15.6] - 2026-11-12
+- Fix typo inside **hash_data_utils.py**
+
 ## [v2.15.6] - 2026-11-11
 - Fix md syntax error in **readme.md**
 

@@ -98,4 +98,4 @@ def count_all_hashes(database: Database) -> int:
         int: The total number of hashes stored in the database.
     """
     
-    return database.count(collection='hasehs')
+    return database.count(collection='hashes')
